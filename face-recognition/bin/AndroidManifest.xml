@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.opencv.samples.facedetect"
+    package="br.ufghomework"
     android:versionCode="21"
     android:versionName="2.1" >
 
@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.opencv.samples.facedetect.PrincipalMenu"
+            android:name="br.ufghomework.control.PrincipalMenu"
             android:label="@string/title_activity_principal_menu" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
