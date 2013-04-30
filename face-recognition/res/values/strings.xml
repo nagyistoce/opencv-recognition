@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">UFG - Face Recognition</string>
-    <string name="title_activity_principal_menu">Menu Principal</string>
+    <string name="title_activity_principal_menu">UFG - Face Recognition</string>
     <string name="action_settings">Settings</string>
     <string name="imgbt_face_database">Face Database</string>
     <string name="imgbt_face_recog">Face Recognition</string>

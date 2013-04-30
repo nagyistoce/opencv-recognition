@@ -17,6 +17,8 @@
     <ImageButton 
         android:id="@+id/imgbt_face_database"
         android:contentDescription="@string/imgbt_face_database"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:src="@drawable/face_database"
         android:layout_below="@id/tv_title_selecione_opcao"
@@ -25,6 +27,8 @@
     <ImageButton 
         android:id="@+id/imgbt_face_recog"
         android:contentDescription="@string/imgbt_face_recog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_toRightOf="@id/imgbt_face_database"
         android:layout_margin="20dp"
         android:src="@drawable/face_recog"
