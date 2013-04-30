@@ -6,7 +6,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".PrincipalMenu" >
+    tools:context=".PrincipalMenuActivity" >
 
     <TextView
         android:id="@+id/tv_title_selecione_opcao"
@@ -18,7 +18,7 @@
         android:id="@+id/imgbt_face_database"
         android:contentDescription="@string/imgbt_face_database"
         android:layout_margin="20dp"
-        android:src="@drawable/face-database"
+        android:src="@drawable/face_database"
         android:layout_below="@id/tv_title_selecione_opcao"
         />
 
@@ -27,8 +27,8 @@
         android:contentDescription="@string/imgbt_face_recog"
         android:layout_toRightOf="@id/imgbt_face_database"
         android:layout_margin="20dp"
-        android:src="@drawable/face-recog"
+        android:src="@drawable/face_recog"
         android:layout_below="@id/tv_title_selecione_opcao"
         />
-
+    
 </RelativeLayout>
