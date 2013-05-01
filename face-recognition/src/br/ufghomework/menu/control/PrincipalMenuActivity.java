@@ -1,21 +1,19 @@
-package br.ufghomework.control;
+package br.ufghomework.menu.control;
 
 import org.opencv.samples.facedetect.FdActivity;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import br.ufghomework.R;
+import br.ufghomework.facedatabase.control.FaceDatabaseMenuActivity;
 
 public class PrincipalMenuActivity extends Activity {
 	
-	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -47,11 +45,16 @@ public class PrincipalMenuActivity extends Activity {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 
-			Intent faceDatabaseIntent = new Intent( MediaStore.ACTION_IMAGE_CAPTURE );
+			if ( event.getAction() == MotionEvent.ACTION_DOWN ) {
+				
+				Intent faceDatabaseIntent = new Intent( PrincipalMenuActivity.this, FaceDatabaseMenuActivity.class );
+				
+				startActivity( faceDatabaseIntent );
+				
+				return true;
+				
+			} else return false;
 			
-			startActivityForResult(faceDatabaseIntent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
-			
-			return true;
 		}
 		
 	}
@@ -61,11 +64,16 @@ public class PrincipalMenuActivity extends Activity {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 
-			Intent faceDatabaseIntent = new Intent( PrincipalMenuActivity.this, FdActivity.class );
+			if ( event.getAction() == MotionEvent.ACTION_DOWN ) {
 			
-			startActivity( faceDatabaseIntent );
+				Intent faceRecognitionIntent = new Intent( PrincipalMenuActivity.this, FdActivity.class );
+				
+				startActivity( faceRecognitionIntent );
+				
+				return true;
 			
-			return true;
+			} else return false;
+			
 		}
 		
 	}
