@@ -1,8 +1,9 @@
-package org.opencv.samples.facedetect;
+package br.ufghomework.facerecog.control;
 
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.Menu;
+import br.ufghomework.facerecog.R;
 
 public class PrincipalMenuActivity extends Activity {
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.opencv.samples.facedetect"
+    package="br.ufghomework.facerecog"
     android:versionCode="21"
     android:versionName="2.1" >
 
@@ -15,7 +15,7 @@
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:name="org.opencv.samples.facedetect.PrincipalMenuActivity"
+            android:name="br.ufghomework.facerecog.control.PrincipalMenuActivity"
             android:label="@string/title_activity_principal_menu" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

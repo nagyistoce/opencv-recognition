@@ -19,19 +19,22 @@
         android:id="@+id/imbt_face_database"
         android:layout_below="@id/tv_seelcione_opcao"
         android:contentDescription="@string/dsc_face_database"
-        android:layout_toRightOf="@+id/imbt_face_recog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        
+        android:layout_margin="20dp"
+        android:background="@null"
         android:src="@drawable/icon_face_database" 
         />
 
     <ImageButton
-        android:id="@id/imbt_face_recog"
+        android:id="@+id/imbt_face_recog"
         android:layout_below="@id/tv_seelcione_opcao"
         android:contentDescription="@string/dsc_face_recog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/imbt_face_database"
+        android:layout_margin="20dp"
+        android:background="@null"
         android:src="@drawable/icon_face_recog" 
         />
     
