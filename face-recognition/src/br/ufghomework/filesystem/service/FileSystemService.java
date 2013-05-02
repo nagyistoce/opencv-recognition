@@ -62,4 +62,18 @@ public final class FileSystemService {
 		
 	}
 	
+	public static String mountFilePath( String... archivesNames ) {
+		
+		final StringBuilder path = new StringBuilder();
+		
+		for( String archiveName : archivesNames ) {
+			
+			path.append( archiveName ).append( File.separator ); 
+			
+		}
+		
+		return path.toString();
+		
+	}
+	
 }
