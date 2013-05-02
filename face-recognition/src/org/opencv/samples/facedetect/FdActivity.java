@@ -26,7 +26,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
-import br.ufghomework.facerecog.R;
+import br.ufghomework.R;
 
 public class FdActivity extends Activity implements CvCameraViewListener2 {
 

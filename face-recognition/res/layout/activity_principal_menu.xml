@@ -9,33 +9,29 @@
     tools:context=".PrincipalMenuActivity" >
 
     <TextView
-        android:id="@+id/tv_seelcione_opcao"
+        android:id="@+id/tv_title_selecione_opcao"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:text="@string/title_selecione_opcao" />
+        android:text="@string/tv_title_selecione_opcao" />
     
-    <ImageButton
-        android:id="@+id/imbt_face_database"
-        android:layout_below="@id/tv_seelcione_opcao"
-        android:contentDescription="@string/dsc_face_database"
+    <ImageButton 
+        android:id="@+id/imgbt_face_database"
+        android:contentDescription="@string/imgbt_face_database"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:background="@null"
-        android:src="@drawable/icon_face_database" 
+        android:src="@drawable/face_database"
+        android:layout_below="@id/tv_title_selecione_opcao"
         />
 
-    <ImageButton
-        android:id="@+id/imbt_face_recog"
-        android:layout_below="@id/tv_seelcione_opcao"
-        android:contentDescription="@string/dsc_face_recog"
+    <ImageButton 
+        android:id="@+id/imgbt_face_recog"
+        android:contentDescription="@string/imgbt_face_recog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/imbt_face_database"
+        android:layout_toRightOf="@id/imgbt_face_database"
         android:layout_margin="20dp"
-        android:background="@null"
-        android:src="@drawable/icon_face_recog" 
-        />
+        android:src="@drawable/face_recog"
+        android:layout_below="@id/tv_title_selecione_opcao" />
     
 </RelativeLayout>

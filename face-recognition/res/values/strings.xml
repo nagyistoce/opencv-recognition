@@ -2,10 +2,19 @@
 <resources>
 
     <string name="app_name">UFG - Face Recognition</string>
-    <string name="title_activity_principal_menu">Menu Principal</string>
+    <string name="title_activity_principal_menu">UFG - Face Recognition</string>
     <string name="action_settings">Settings</string>
-    <string name="title_selecione_opcao">Selecione uma opção</string>
-    <string name="dsc_face_database">Tire uma foto para a base de dados</string>
-    <string name="dsc_face_recog">Vamos nos identificar!</string>
+    <string name="imgbt_face_database">Face Database</string>
+    <string name="imgbt_face_recog">Face Recognition</string>
+    <string name="imgbt_create_sample">Tirar fotos para sample</string>
+    <string name="tv_title_selecione_opcao">Selecione uma das opções</string>
+    <string name="tv_dsc_funcionalidade">Você precisa tirar 10 fotos para criar um sample.</string>
+    <string name="tv_quantidade_fotos_sample">0</string>
+    <string name="tv_title_preencha_campo">Preencha o campo</string>
+    <string name="tv_label_sample_name">Nome do sample:</string>
+    <string name="bt_start_sample">Comece um Sample</string>
+    <string name="edtx_hint_sample_name">Coloque um nome sem espaço e sem caracteres especiais.</string>
+    <string name="title_activity_face_database_menu">Face Database Options</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
