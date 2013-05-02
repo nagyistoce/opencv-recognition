@@ -16,6 +16,9 @@ import android.widget.Toast;
 import br.ufghomework.R;
 import br.ufghomework.facedatabase.service.FileSystemFaceDatabaseService;
 import br.ufghomework.filesystem.service.FileSystemService;
+import br.ufghomework.model.Photo;
+import br.ufghomework.model.Sample;
+import br.ufghomework.model.exceptions.InvalidPhotoException;
 
 public class FaceDatabaseMenuActivity extends Activity {
 
@@ -26,11 +29,11 @@ public class FaceDatabaseMenuActivity extends Activity {
 	public static final String STATE_FIELD_LAST_SAVED_SAMPLE_URI = "lastSavedSampleUri";
 	public static final String SAMPLE_FILE_URI_DESC = "faceSamples";
 	public static final String LOG_INFO_PHOTO_CAPTURE_PROBLEM = "Houve algum problema ao tirar a foto. Tente novamente.";
+	public static final String LOG_ERROR_INVALID_PHOTO = "A Uri da foto criada é inválido.";
 
 	private Integer sampleQuantity;
-	private Uri lastSavedSampleUri;
+	private Sample sample;
 	private Boolean isSampleNameEnabled;
-	private String samplesName;
 	
 	private EditText samplesNameView;
 	private Button startSample;
@@ -112,14 +115,17 @@ public class FaceDatabaseMenuActivity extends Activity {
 		
 	}
 
-	private Uri configureNewSampleUri( final String samplesName ) {
+	private Photo configureNewPhotoUri( final String photoName ) {
+		
+		final Photo newPhoto = new Photo();
 		
 		sampleQuantity++;
 		
-		lastSavedSampleUri = FileSystemFaceDatabaseService
-				.getSampleFileOrCreateItUri( FileSystemService.mountFilePath( SAMPLE_FILE_URI_DESC, samplesName ), samplesName.concat( sampleQuantity.toString() ) );
+		newPhoto.setPhotoUri( FileSystemFaceDatabaseService
+				.getSampleFileOrCreateItUri( FileSystemService.mountFilePath( SAMPLE_FILE_URI_DESC, photoName ), 
+						photoName.concat( sampleQuantity.toString() ) ) );
 		
-		return lastSavedSampleUri; 
+		return newPhoto; 
 		
 	}
 	
@@ -130,26 +136,42 @@ public class FaceDatabaseMenuActivity extends Activity {
 	 *
 	 */
 	private class OnTouchStartSampleListener implements OnTouchListener {
-
+		
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			
 			if ( event.getAction() == MotionEvent.ACTION_DOWN ) {
 				
-				if ( samplesName != null ) {
+				final String sampleName = samplesNameView.getText().toString();
+				
+				if ( sampleName != null && !sampleName.equals( "" ) ) {
 					
-					samplesName = samplesNameView.getText().toString();
+					sample = new Sample();
+					sample.setSampleName( sampleName );
+					
+					try {
+						
+						sample.add( configureNewPhotoUri( sampleName ) );
+						
+					} catch (InvalidPhotoException e) {
+						
+						Toast.makeText( FaceDatabaseMenuActivity.this, LOG_ERROR_INVALID_PHOTO, Toast.LENGTH_SHORT ).show();
+						Log.e( TAG, LOG_ERROR_INVALID_PHOTO, e );
+						
+						return false;
+						
+					}
 					
 					isSampleNameEnabled = false;
 					
 					Intent takePhotoSampleIntent = new Intent( MediaStore.ACTION_IMAGE_CAPTURE );
-					takePhotoSampleIntent.putExtra(MediaStore.EXTRA_OUTPUT, configureNewSampleUri( samplesName ) );
+					takePhotoSampleIntent.putExtra(MediaStore.EXTRA_OUTPUT, sample.getSamplesPhotos().get( sample.getSamplesPhotos().size() - 1 ).getPhotoUri() );
 					
 					startActivityForResult( takePhotoSampleIntent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE );
 					
-				}
-				
-				return true;
+					return true;
+					
+				} else return false;
 				
 			} else return false;
 		}
