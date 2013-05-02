@@ -28,6 +28,7 @@ public class FaceDatabaseMenuActivity extends Activity {
 	public static final String STATE_FIELD_SAVED_SAMPLE = "lastSavedSampleUri";
 	public static final String SAMPLE_FILE_URI_DESC = "faceSamples";
 	public static final String LOG_INFO_PHOTO_CAPTURE_PROBLEM = "Houve algum problema ao tirar a foto. Tente novamente.";
+	public static final String LOG_INFO_SAMPLE_NAME_PROBLEM = "Nome inválido para sample. Tente novamente.";
 	public static final String LOG_ERROR_INVALID_PHOTO = "A Uri da foto criada é inválido.";
 
 	private Integer photoQuantity;
@@ -189,7 +190,11 @@ public class FaceDatabaseMenuActivity extends Activity {
 					
 					return true;
 					
-				} else return false;
+				} else {
+					
+					Toast.makeText( FaceDatabaseMenuActivity.this, LOG_INFO_SAMPLE_NAME_PROBLEM, Toast.LENGTH_SHORT ).show();
+					return false;
+				}
 				
 			} else return false;
 		}
