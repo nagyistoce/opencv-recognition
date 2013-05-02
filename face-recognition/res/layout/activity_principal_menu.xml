@@ -32,7 +32,6 @@
         android:layout_toRightOf="@id/imgbt_face_database"
         android:layout_margin="20dp"
         android:src="@drawable/face_recog"
-        android:layout_below="@id/tv_title_selecione_opcao"
-        />
+        android:layout_below="@id/tv_title_selecione_opcao" />
     
 </RelativeLayout>

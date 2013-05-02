@@ -15,7 +15,9 @@
             android:screenOrientation="landscape" >
         </activity>
         <activity
+
             android:name="br.ufghomework.menu.control.PrincipalMenuActivity"
+
             android:label="@string/title_activity_principal_menu" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
