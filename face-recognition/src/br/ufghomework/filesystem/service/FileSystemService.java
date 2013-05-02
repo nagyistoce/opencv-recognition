@@ -76,4 +76,20 @@ public final class FileSystemService {
 		
 	}
 	
+	public static Uri convertStringToUri( String path ) {
+		
+		return Uri.parse( path );
+		
+	}
+	
+	public static Uri convertStringToUri( String... archivesNames ) {
+		
+		if ( archivesNames != null && archivesNames.length > 0 ) {
+			
+			return convertStringToUri( mountFilePath( archivesNames )  );
+			
+		} else return null;
+		
+	}
+	
 }

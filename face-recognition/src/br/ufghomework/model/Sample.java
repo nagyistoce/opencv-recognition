@@ -1,12 +1,17 @@
 package br.ufghomework.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import br.ufghomework.model.exceptions.InvalidPhotoException;
 
-public class Sample {
+public class Sample implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2055627285708262720L;
 	private String sampleDirectory;
 	private String sampleName;
 	private List<Photo> samplesPhotos;
@@ -17,6 +22,15 @@ public class Sample {
 	public String getSampleDirectory() {
 		return sampleDirectory;
 	}
+
+	/**
+	 * @param sampleDirectory the sampleDirectory to set
+	 */
+	public void setSampleDirectory(String sampleDirectory) {
+		this.sampleDirectory = sampleDirectory;
+	}
+
+
 
 	/**
 	 * @return the sampleName
@@ -51,7 +65,7 @@ public class Sample {
 			
 		}
 		
-		if ( photoToAdd != null && photoToAdd.getPhotoUri() != null && !photoToAdd.getPhotoUri().equals( "" ) ) {
+		if ( photoToAdd != null && photoToAdd.getPhotoName() != null && !photoToAdd.getPhotoName().equals( "" ) ) {
 			
 			this.samplesPhotos.add( photoToAdd );
 			

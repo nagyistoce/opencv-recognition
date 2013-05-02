@@ -11,6 +11,7 @@ import android.util.Log;
 import br.ufghomework.facedatabase.exceptions.SampleFileNotCreatedException;
 import br.ufghomework.filesystem.exceptions.FileNotCreatedException;
 import br.ufghomework.filesystem.service.FileSystemService;
+import br.ufghomework.model.Photo;
 
 /**
  * @author andremello
@@ -19,15 +20,18 @@ import br.ufghomework.filesystem.service.FileSystemService;
 public abstract class FileSystemFaceDatabaseService {
 
 	public final static String TAG = "FileSystemFaceDatabaseService";
-	public final static String FILE_EXTENSION = ".jpg";
 	
 	private FileSystemFaceDatabaseService() {}
 	
-	public static Uri getSampleFileOrCreateItUri( final String dirName, final String samplesName ) {
+	public static Uri getSampleFileOrCreateItUri( Photo newPhoto ) {
+		
+		final String dirName = newPhoto.getPhotoDirectory();
+		final String samplesName = newPhoto.getPhotoName();
+		final String fileExtension = ".".concat( newPhoto.getExtension() );
 		
 		try {
 			
-			return FileSystemService.getFilePathOrCreateItURI( new File( dirName ), samplesName, FILE_EXTENSION );
+			return FileSystemService.getFilePathOrCreateItURI( new File( dirName ), samplesName, fileExtension );
 			
 		} catch (FileNotCreatedException e) {
 			
@@ -39,7 +43,7 @@ public abstract class FileSystemFaceDatabaseService {
 				final File mediaDir = new File( Environment.getExternalStoragePublicDirectory(
 			              Environment.DIRECTORY_PICTURES ), dirName );
 				
-				return FileSystemService.getFilePathOrCreateItURI( mediaDir, samplesName, FILE_EXTENSION ); 
+				return FileSystemService.getFilePathOrCreateItURI( mediaDir, samplesName, fileExtension ); 
 				
 			} catch (FileNotCreatedException e2) {
 				
