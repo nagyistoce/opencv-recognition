@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 import br.ufghomework.R;
 import br.ufghomework.facedatabase.service.FileSystemFaceDatabaseService;
-import br.ufghomework.filesystem.service.FileSystemService;
 import br.ufghomework.model.Photo;
 import br.ufghomework.model.Sample;
 import br.ufghomework.model.exceptions.InvalidPhotoException;
@@ -23,10 +22,10 @@ public class FaceDatabaseMenuActivity extends Activity {
 
 	public static final String TAG = "FaceDatabaseMenuActivity";
 	public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+	public static final String START_SAMPLE_DESC = "Restam {1} fotos para o sample.";
 	public static final String STATE_FIELD_IS_SAMPLE_NAME_ENABLED = "isSampleNameEnabled";
 	public static final String STATE_FIELD_PHOTO_QUANTITY = "photoQuantity";
 	public static final String STATE_FIELD_SAVED_SAMPLE = "lastSavedSampleUri";
-	public static final String SAMPLE_FILE_URI_DESC = "faceSamples";
 	public static final String LOG_INFO_PHOTO_CAPTURE_PROBLEM = "Houve algum problema ao tirar a foto. Tente novamente.";
 	public static final String LOG_INFO_SAMPLE_NAME_PROBLEM = "Nome inválido para sample. Tente novamente.";
 	public static final String LOG_ERROR_INVALID_PHOTO = "A Uri da foto criada é inválido.";
@@ -43,8 +42,10 @@ public class FaceDatabaseMenuActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_face_database_menu);
 
-		initState( savedInstanceState );
-		initComponents( savedInstanceState );
+		startSample = (Button) findViewById( R.id.bt_start_sample );
+		startSample.setOnTouchListener( new OnTouchStartSampleListener() );
+		
+		samplesNameView = (EditText) findViewById( R.id.edtx_sample_name );
 		
 	}
 	
@@ -53,6 +54,59 @@ public class FaceDatabaseMenuActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.face_database_menu, menu);
 		return true;
+	}
+	
+	@Override
+	protected void onResume() {
+		
+		if ( isSampleNameEnabled != null ) {
+			
+			samplesNameView.setEnabled( isSampleNameEnabled );
+			
+		}
+		
+		if ( photoQuantity != null ) {
+
+			if ( photoQuantity > 0 ) {
+				
+				final Integer lasting = 10 - photoQuantity;
+				
+				startSample.setText( START_SAMPLE_DESC.replace( "{1}", lasting.toString() ) );
+				
+			} else if ( photoQuantity >= 10 ) {
+				
+				finish();
+				
+			}
+			
+		} else {
+			
+			photoQuantity = 0;
+			
+		}
+		
+		super.onStart();
+	}
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		
+		if ( savedInstanceState != null ) {
+			
+			sample = (Sample) savedInstanceState.getSerializable( STATE_FIELD_SAVED_SAMPLE ); 
+				
+			photoQuantity = Integer.valueOf( savedInstanceState.getByte( STATE_FIELD_PHOTO_QUANTITY ) );
+			
+			isSampleNameEnabled = savedInstanceState.getBoolean( STATE_FIELD_IS_SAMPLE_NAME_ENABLED );
+			
+		} else {
+			
+			photoQuantity = 0;
+			isSampleNameEnabled = true;
+			
+		}
+		
+		super.onRestoreInstanceState(savedInstanceState);
 	}
 	
 	@Override
@@ -87,54 +141,26 @@ public class FaceDatabaseMenuActivity extends Activity {
 			outState.putSerializable( STATE_FIELD_SAVED_SAMPLE, sample );
 			
 		}
-		
+			
 		super.onSaveInstanceState(outState);
 		
 	}
 	
-	private void initComponents( Bundle savedInstanceState ) {
+	@Override
+	public void onBackPressed() {
 		
-		startSample = (Button) findViewById( R.id.bt_start_sample );
-		startSample.setOnTouchListener( new OnTouchStartSampleListener() );
+		FileSystemFaceDatabaseService.deleteSample( sample );
 		
-		samplesNameView = (EditText) findViewById( R.id.edtx_sample_name );
-		
-		if ( savedInstanceState != null ) {
-			
-			samplesNameView.setEnabled( isSampleNameEnabled );
-			
-		}
-			
-	}
-	
-	private void initState( Bundle savedInstanceState ) {
-		
-		if ( savedInstanceState != null ) {
-			
-			sample = (Sample) savedInstanceState.getSerializable( STATE_FIELD_SAVED_SAMPLE ); 
-				
-			photoQuantity = Integer.valueOf( savedInstanceState.getByte( STATE_FIELD_PHOTO_QUANTITY ) );
-			
-			isSampleNameEnabled = savedInstanceState.getBoolean( STATE_FIELD_IS_SAMPLE_NAME_ENABLED );
-			
-		} else {
-			
-			photoQuantity = 0;
-			isSampleNameEnabled = true;
-			
-		}
-		
+		super.onBackPressed();
 	}
 
-	private void addNewPhoto( final String photoName, final Sample sample ) throws InvalidPhotoException {
+	private void startPhotoActivity() {
 		
-		final Photo newPhoto = new Photo();
+		final Intent takePhotoSampleIntent = new Intent( MediaStore.ACTION_IMAGE_CAPTURE );
+		takePhotoSampleIntent.putExtra( MediaStore.EXTRA_OUTPUT, 
+				FileSystemFaceDatabaseService.getSampleFileOrCreateItUri( sample.retrieveLastPhoto(), sample.getSampleName() ) );
 		
-		newPhoto.setPhotoName( photoName );
-		newPhoto.setPhotoDirectory( sample.getSampleDirectory() );
-		newPhoto.setExtension( "jpg" );
-		
-		sample.add( newPhoto );
+		startActivityForResult( takePhotoSampleIntent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE );
 		
 	}
 	
@@ -162,37 +188,35 @@ public class FaceDatabaseMenuActivity extends Activity {
 					}
 					
 					sample.setSampleName( sampleName );
-					sample.setSampleDirectory( FileSystemService.mountFilePath( SAMPLE_FILE_URI_DESC, sample.getSampleName() ) );
 					
 					try {
 						
 						photoQuantity++;
 
-						addNewPhoto( sampleName.concat( photoQuantity.toString() ), sample );
+						final Photo newPhoto = new Photo();
+						
+						newPhoto.setPhotoName( sample.getSampleName().concat( photoQuantity.toString() ) );
+						
+						sample.add( newPhoto );
 						
 					} catch (InvalidPhotoException e) {
 						
-						Toast.makeText( FaceDatabaseMenuActivity.this, LOG_ERROR_INVALID_PHOTO, Toast.LENGTH_SHORT ).show();
+						Toast.makeText( FaceDatabaseMenuActivity.this, LOG_ERROR_INVALID_PHOTO, Toast.LENGTH_LONG ).show();
 						Log.e( TAG, LOG_ERROR_INVALID_PHOTO, e );
 						
 						return false;
 						
 					}
 					
-					final Photo newPhoto = sample.getSamplesPhotos().get( sample.getSamplesPhotos().size() - 1 );
-					
 					isSampleNameEnabled = false;
 					
-					Intent takePhotoSampleIntent = new Intent( MediaStore.ACTION_IMAGE_CAPTURE );
-					takePhotoSampleIntent.putExtra(MediaStore.EXTRA_OUTPUT, FileSystemFaceDatabaseService.getSampleFileOrCreateItUri( newPhoto ) );
-					
-					startActivityForResult( takePhotoSampleIntent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE );
+					startPhotoActivity();
 					
 					return true;
 					
 				} else {
 					
-					Toast.makeText( FaceDatabaseMenuActivity.this, LOG_INFO_SAMPLE_NAME_PROBLEM, Toast.LENGTH_SHORT ).show();
+					Toast.makeText( FaceDatabaseMenuActivity.this, LOG_INFO_SAMPLE_NAME_PROBLEM, Toast.LENGTH_LONG ).show();
 					return false;
 				}
 				

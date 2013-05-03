@@ -12,26 +12,9 @@ public class Sample implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 2055627285708262720L;
-	private String sampleDirectory;
 	private String sampleName;
 	private List<Photo> samplesPhotos;
 	
-	/**
-	 * @return the sampleDirectory
-	 */
-	public String getSampleDirectory() {
-		return sampleDirectory;
-	}
-
-	/**
-	 * @param sampleDirectory the sampleDirectory to set
-	 */
-	public void setSampleDirectory(String sampleDirectory) {
-		this.sampleDirectory = sampleDirectory;
-	}
-
-
-
 	/**
 	 * @return the sampleName
 	 */
@@ -70,6 +53,16 @@ public class Sample implements Serializable {
 			this.samplesPhotos.add( photoToAdd );
 			
 		} else throw new InvalidPhotoException();
+		
+	}
+	
+	public Photo retrieveLastPhoto() {
+		
+		if ( samplesPhotos != null && samplesPhotos.size() > 0 ) {
+			
+			return samplesPhotos.get( samplesPhotos.size() - 1 );
+			
+		} else return null;
 		
 	}
 	

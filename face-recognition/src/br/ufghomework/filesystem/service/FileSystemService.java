@@ -82,7 +82,7 @@ public final class FileSystemService {
 		
 	}
 	
-	public static Uri convertStringToUri( String... archivesNames ) {
+	public static Uri convertStringToUri( final String... archivesNames ) {
 		
 		if ( archivesNames != null && archivesNames.length > 0 ) {
 			
@@ -90,6 +90,26 @@ public final class FileSystemService {
 			
 		} else return null;
 		
+	}
+	
+	public static void recursiveArchiveDelete( File archiveToDelete ) {
+		
+		if ( archiveToDelete.isDirectory() ) {
+
+			for ( File child : archiveToDelete.listFiles() ) {
+				
+				recursiveArchiveDelete( child );
+				
+			}
+			
+			archiveToDelete.delete();
+			
+		} else {
+			
+			archiveToDelete.delete();
+			
+		}
+			
 	}
 	
 }
