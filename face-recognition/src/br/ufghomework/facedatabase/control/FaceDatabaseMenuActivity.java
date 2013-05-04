@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -47,41 +46,41 @@ public class FaceDatabaseMenuActivity extends Activity {
 		
 		samplesNameView = (EditText) findViewById( R.id.edtx_sample_name );
 		
+		if ( isSampleNameEnabled == null ) {
+
+			isSampleNameEnabled = true;
+			
+		}
+		
+		if ( photoQuantity == null ) {
+			
+			photoQuantity = 0;
+			
+		}
+		
 	}
 	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.face_database_menu, menu);
-		return true;
-	}
+//	@Override
+//	public boolean onCreateOptionsMenu(Menu menu) {
+//		// Inflate the menu; this adds items to the action bar if it is present.
+//		getMenuInflater().inflate(R.menu.face_database_menu, menu);
+//		return true;
+//	}
 	
 	@Override
 	protected void onResume() {
 		
-		if ( isSampleNameEnabled != null ) {
-			
-			samplesNameView.setEnabled( isSampleNameEnabled );
-			
-		}
+		samplesNameView.setEnabled( isSampleNameEnabled );
 		
-		if ( photoQuantity != null ) {
-
-			if ( photoQuantity > 0 ) {
-				
-				final Integer lasting = 10 - photoQuantity;
-				
-				startSample.setText( START_SAMPLE_DESC.replace( "{1}", lasting.toString() ) );
-				
-			} else if ( photoQuantity >= 10 ) {
-				
-				finish();
-				
-			}
+		if ( photoQuantity > 0 ) {
 			
-		} else {
+			final Integer lasting = 10 - photoQuantity;
 			
-			photoQuantity = 0;
+			startSample.setText( START_SAMPLE_DESC.replace( "{1}", lasting.toString() ) );
+			
+		} else if ( photoQuantity >= 10 ) {
+			
+			finish();
 			
 		}
 		
@@ -98,11 +97,6 @@ public class FaceDatabaseMenuActivity extends Activity {
 			photoQuantity = Integer.valueOf( savedInstanceState.getByte( STATE_FIELD_PHOTO_QUANTITY ) );
 			
 			isSampleNameEnabled = savedInstanceState.getBoolean( STATE_FIELD_IS_SAMPLE_NAME_ENABLED );
-			
-		} else {
-			
-			photoQuantity = 0;
-			isSampleNameEnabled = true;
 			
 		}
 		
