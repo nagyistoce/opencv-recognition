@@ -2,6 +2,7 @@ package br.ufghomework.facedatabase.control;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -26,6 +27,8 @@ public class FaceDatabaseMenuActivity extends Activity {
 	public static final String STATE_FIELD_PHOTO_QUANTITY = "photoQuantity";
 	public static final String STATE_FIELD_SAVED_SAMPLE = "lastSavedSampleUri";
 	public static final String LOG_INFO_PHOTO_CAPTURE_PROBLEM = "Houve algum problema ao tirar a foto. Tente novamente.";
+	public static final String LOG_INFO_PHOTO_CAPTURE_CANCEL = "Captura cancelada. Tente novamente.";
+	public static final String LOG_INFO_SAMPLE_COMPLETE = "Sample {1} completo";
 	public static final String LOG_INFO_SAMPLE_NAME_PROBLEM = "Nome inválido para sample. Tente novamente.";
 	public static final String LOG_ERROR_INVALID_PHOTO = "A Uri da foto criada é inválido.";
 
@@ -59,13 +62,6 @@ public class FaceDatabaseMenuActivity extends Activity {
 		}
 		
 	}
-	
-//	@Override
-//	public boolean onCreateOptionsMenu(Menu menu) {
-//		// Inflate the menu; this adds items to the action bar if it is present.
-//		getMenuInflater().inflate(R.menu.face_database_menu, menu);
-//		return true;
-//	}
 	
 	@Override
 	protected void onResume() {
@@ -106,21 +102,44 @@ public class FaceDatabaseMenuActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		
-		super.onActivityResult(requestCode, resultCode, data);
-		
 		if ( resultCode == Activity.RESULT_OK && requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE ) {
 
+			isSampleNameEnabled = false;
 			
+			if ( photoQuantity >= 10 ) {
+
+				Toast.makeText( this, LOG_INFO_SAMPLE_COMPLETE.replace( "{1}", sample.getSampleName() ), Toast.LENGTH_LONG ).show();
+				
+				finish();
+				
+			}
+			
+			final Uri csvFileUri = FileSystemFaceDatabaseService.getCSVMapFileOrCreateItUri();
+			
+			if ( !FileSystemFaceDatabaseService.writeNewSampleLine( csvFileUri, sample ) ) {
+
+				Toast.makeText( this, "Sample não pode ser criado. Falha no arquivo csv.", Toast.LENGTH_LONG );
+				
+			}
+			
+			photoQuantity++;
+			
+		} else if ( resultCode == Activity.RESULT_CANCELED ) {
+			
+			Toast.makeText( this, LOG_INFO_PHOTO_CAPTURE_CANCEL, Toast.LENGTH_LONG ).show();
+			
+			Log.i( TAG, LOG_INFO_PHOTO_CAPTURE_CANCEL );
 			
 		} else {
 			
-			photoQuantity--;
-			
-			Toast.makeText( this, LOG_INFO_PHOTO_CAPTURE_PROBLEM, Toast.LENGTH_SHORT ).show();
+			Toast.makeText( this, LOG_INFO_PHOTO_CAPTURE_PROBLEM, Toast.LENGTH_LONG ).show();
 			
 			Log.i( TAG, LOG_INFO_PHOTO_CAPTURE_PROBLEM );
 			
+			
 		}
+		
+		super.onActivityResult(requestCode, resultCode, data);
 		
 	}
 	
@@ -185,8 +204,6 @@ public class FaceDatabaseMenuActivity extends Activity {
 					
 					try {
 						
-						photoQuantity++;
-
 						final Photo newPhoto = new Photo();
 						
 						newPhoto.setPhotoName( sample.getSampleName().concat( photoQuantity.toString() ) );
@@ -201,8 +218,6 @@ public class FaceDatabaseMenuActivity extends Activity {
 						return false;
 						
 					}
-					
-					isSampleNameEnabled = false;
 					
 					startPhotoActivity();
 					
