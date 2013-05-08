@@ -12,12 +12,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import br.ufghomework.R;
+import br.ufghomework.facedatabase.exceptions.InvalidCSVSampleContentException;
 import br.ufghomework.facedatabase.service.FileSystemFaceDatabaseService;
 import br.ufghomework.filesystem.exceptions.FileWriteProblemException;
 import br.ufghomework.model.Photo;
 import br.ufghomework.model.Sample;
 import br.ufghomework.model.exceptions.InvalidPhotoException;
-import br.ufghomework.model.exceptions.InvalidSampleException;
+import br.ufghomework.model.exceptions.InvalidSampleNameException;
 
 public class FaceDatabaseMenuActivity extends Activity {
 
@@ -124,7 +125,7 @@ public class FaceDatabaseMenuActivity extends Activity {
 					Toast.makeText( this, LOG_ERROR_UNAVAILABLE_MAP_FILE, Toast.LENGTH_LONG );
 					Log.e( TAG, LOG_ERROR_UNAVAILABLE_MAP_FILE, e );
 					
-				} catch (InvalidSampleException e) {
+				} catch (InvalidCSVSampleContentException e) {
 
 					FileSystemFaceDatabaseService.deleteSample( sample );
 					
@@ -207,43 +208,42 @@ public class FaceDatabaseMenuActivity extends Activity {
 				
 				final String sampleName = samplesNameView.getText().toString();
 				
-				if ( sampleName != null && !sampleName.equals( "" ) ) {
-					
-					if ( sample == null ) {
+				if ( sample == null ) {
 						
-						sample = new Sample();
-						
-					}
-					
-					sample.setSampleName( sampleName );
-					
 					try {
 						
-						final Photo newPhoto = new Photo();
+						sample = new Sample( sampleName );
 						
-						newPhoto.setPhotoName( sample.getSampleName().concat( photoQuantity.toString() ) );
+					} catch (InvalidSampleNameException e) {
 						
-						sample.add( newPhoto );
-						
-					} catch (InvalidPhotoException e) {
-						
-						Toast.makeText( FaceDatabaseMenuActivity.this, LOG_ERROR_INVALID_PHOTO, Toast.LENGTH_LONG ).show();
-						Log.e( TAG, LOG_ERROR_INVALID_PHOTO, e );
-						
-						return false;
+						Toast.makeText( FaceDatabaseMenuActivity.this, e.getMessage(), Toast.LENGTH_LONG ).show();
+						Log.w( TAG, LOG_ERROR_INVALID_SAMPLE.replace( "{1}", sampleName ), e );
 						
 					}
 					
-					startPhotoActivity();
-					
-					return true;
-					
-				} else {
-					
-					Toast.makeText( FaceDatabaseMenuActivity.this, LOG_INFO_SAMPLE_NAME_PROBLEM, Toast.LENGTH_LONG ).show();
-					return false;
 				}
 				
+				try {
+					
+					final Photo newPhoto = new Photo();
+					
+					newPhoto.setPhotoName( sample.getSampleName().concat( photoQuantity.toString() ) );
+					
+					sample.add( newPhoto );
+					
+				} catch (InvalidPhotoException e) {
+					
+					Toast.makeText( FaceDatabaseMenuActivity.this, e.getMessage(), Toast.LENGTH_LONG ).show();
+					Log.w( TAG, LOG_ERROR_INVALID_PHOTO, e );
+					
+					return false;
+					
+				}
+				
+				startPhotoActivity();
+				
+				return true;
+					
 			} else return false;
 		}
 		

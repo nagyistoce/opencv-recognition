@@ -3,8 +3,11 @@ package br.ufghomework.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import br.ufghomework.model.exceptions.InvalidPhotoException;
+import br.ufghomework.model.exceptions.InvalidSampleNameException;
 
 public class Sample implements Serializable {
 
@@ -15,6 +18,12 @@ public class Sample implements Serializable {
 	private String sampleName;
 	private List<Photo> samplesPhotos;
 	
+	public Sample( String sampleName ) throws InvalidSampleNameException {
+		
+		setSampleName( sampleName );
+		
+	}
+	
 	/**
 	 * @return the sampleName
 	 */
@@ -24,9 +33,23 @@ public class Sample implements Serializable {
 
 	/**
 	 * @param sampleName the sampleName to set
+	 * @throws InvalidSampleNameException 
 	 */
-	public void setSampleName(String sampleName) {
-		this.sampleName = sampleName;
+	public void setSampleName(String sampleName) throws InvalidSampleNameException {
+		
+		Pattern validNamePattern = Pattern.compile( "[aA0-zZ9_]+" );
+		Matcher validNameMatcher = validNamePattern.matcher( sampleName );
+		
+		if ( validNameMatcher.matches() ) {
+			
+			this.sampleName = sampleName;
+			
+		} else {
+			
+			throw new InvalidSampleNameException( sampleName );
+			
+		}
+		
 	}
 
 	/**

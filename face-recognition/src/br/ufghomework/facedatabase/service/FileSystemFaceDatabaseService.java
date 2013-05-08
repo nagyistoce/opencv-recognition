@@ -17,7 +17,6 @@ import br.ufghomework.filesystem.exceptions.FileWriteProblemException;
 import br.ufghomework.filesystem.service.FileSystemService;
 import br.ufghomework.model.Photo;
 import br.ufghomework.model.Sample;
-import br.ufghomework.model.exceptions.InvalidSampleException;
 
 /**
  * @author andremello
@@ -209,7 +208,7 @@ public abstract class FileSystemFaceDatabaseService {
 		
 	}
 
-	public static void addNewSampleContent( Sample sample ) throws FileWriteProblemException, InvalidSampleException {
+	public static void addNewSampleContent( Sample sample ) throws FileWriteProblemException, InvalidCSVSampleContentException {
 		
 		final StringBuilder newContent = new StringBuilder();
 		
@@ -225,16 +224,8 @@ public abstract class FileSystemFaceDatabaseService {
 		
 		final Uri csvFileUri = FileSystemFaceDatabaseService.getCSVMapFileOrCreateItUri();
 		
-		try {
+		FileSystemFaceDatabaseService.writeNewSampleContent( csvFileUri, newContent );
 			
-			FileSystemFaceDatabaseService.writeNewSampleContent( csvFileUri, newContent );
-			
-		} catch (InvalidCSVSampleContentException e) {
-			
-			throw new InvalidSampleException( sample.getSampleName(), e );
-			
-		}
-		
 	}
 	
 }
