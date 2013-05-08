@@ -2,7 +2,6 @@ package br.ufghomework.facedatabase.control;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -14,9 +13,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 import br.ufghomework.R;
 import br.ufghomework.facedatabase.service.FileSystemFaceDatabaseService;
+import br.ufghomework.filesystem.exceptions.FileWriteProblemException;
 import br.ufghomework.model.Photo;
 import br.ufghomework.model.Sample;
 import br.ufghomework.model.exceptions.InvalidPhotoException;
+import br.ufghomework.model.exceptions.InvalidSampleException;
 
 public class FaceDatabaseMenuActivity extends Activity {
 
@@ -31,6 +32,8 @@ public class FaceDatabaseMenuActivity extends Activity {
 	public static final String LOG_INFO_SAMPLE_COMPLETE = "Sample {1} completo";
 	public static final String LOG_INFO_SAMPLE_NAME_PROBLEM = "Nome inválido para sample. Tente novamente.";
 	public static final String LOG_ERROR_INVALID_PHOTO = "A Uri da foto criada é inválido.";
+	public static final String LOG_ERROR_UNAVAILABLE_MAP_FILE = "O arquivo de mapeamento não está disponível.";
+	public static final String LOG_ERROR_INVALID_SAMPLE = "O sample {1} é inválido.";
 
 	private Integer photoQuantity;
 	private Sample sample;
@@ -57,7 +60,7 @@ public class FaceDatabaseMenuActivity extends Activity {
 		
 		if ( photoQuantity == null ) {
 			
-			photoQuantity = 0;
+			photoQuantity = 1;
 			
 		}
 		
@@ -68,9 +71,9 @@ public class FaceDatabaseMenuActivity extends Activity {
 		
 		samplesNameView.setEnabled( isSampleNameEnabled );
 		
-		if ( photoQuantity > 0 ) {
+		if ( photoQuantity > 1 ) {
 			
-			final Integer lasting = 10 - photoQuantity;
+			final Integer lasting = 10 - sample.getSamplesPhotos().size();
 			
 			startSample.setText( START_SAMPLE_DESC.replace( "{1}", lasting.toString() ) );
 			
@@ -110,15 +113,27 @@ public class FaceDatabaseMenuActivity extends Activity {
 
 				Toast.makeText( this, LOG_INFO_SAMPLE_COMPLETE.replace( "{1}", sample.getSampleName() ), Toast.LENGTH_LONG ).show();
 				
-				finish();
-				
-			}
-			
-			final Uri csvFileUri = FileSystemFaceDatabaseService.getCSVMapFileOrCreateItUri();
-			
-			if ( !FileSystemFaceDatabaseService.writeNewSampleLine( csvFileUri, sample ) ) {
+				try {
+					
+					FileSystemFaceDatabaseService.addNewSampleContent( sample );
+					
+				} catch (FileWriteProblemException e) {
 
-				Toast.makeText( this, "Sample não pode ser criado. Falha no arquivo csv.", Toast.LENGTH_LONG );
+					FileSystemFaceDatabaseService.deleteSample( sample );
+					
+					Toast.makeText( this, LOG_ERROR_UNAVAILABLE_MAP_FILE, Toast.LENGTH_LONG );
+					Log.e( TAG, LOG_ERROR_UNAVAILABLE_MAP_FILE, e );
+					
+				} catch (InvalidSampleException e) {
+
+					FileSystemFaceDatabaseService.deleteSample( sample );
+					
+					Toast.makeText( this, LOG_ERROR_INVALID_SAMPLE.replace( "{1}", sample.getSampleName() ), Toast.LENGTH_LONG );
+					Log.e( TAG, LOG_ERROR_INVALID_SAMPLE.replace( "{1}", sample.getSampleName() ), e );
+					
+				}
+				
+				finish();
 				
 			}
 			

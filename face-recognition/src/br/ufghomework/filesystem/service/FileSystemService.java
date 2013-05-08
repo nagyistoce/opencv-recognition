@@ -27,7 +27,7 @@ public final class FileSystemService {
 	public final static String TAG = "FileSystemService";
 	public final static String MEDIA_STOREGEDIR_EXISTS = "O caminho {1} já existe.";
 	public final static String FILE_ENCODING = "UTF-8";
-	public final static String newLine = System.getProperty("line.separator");
+	public final static String NEW_LINE = System.getProperty("line.separator");
 	
 	private FileSystemService() {}
 	
@@ -102,7 +102,7 @@ public final class FileSystemService {
 		
 		while ( scanner.hasNextLine() ) {
 			
-			content.append( scanner.nextLine() ).append( newLine );
+			content.append( scanner.nextLine() ).append( NEW_LINE );
 			
 		}
 		

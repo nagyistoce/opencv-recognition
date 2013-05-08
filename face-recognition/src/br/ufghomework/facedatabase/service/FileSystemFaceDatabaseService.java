@@ -10,12 +10,14 @@ import java.io.UnsupportedEncodingException;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
+import br.ufghomework.facedatabase.exceptions.InvalidCSVSampleContentException;
 import br.ufghomework.facedatabase.exceptions.SampleFileNotCreatedException;
 import br.ufghomework.filesystem.exceptions.FileNotCreatedException;
 import br.ufghomework.filesystem.exceptions.FileWriteProblemException;
 import br.ufghomework.filesystem.service.FileSystemService;
 import br.ufghomework.model.Photo;
 import br.ufghomework.model.Sample;
+import br.ufghomework.model.exceptions.InvalidSampleException;
 
 /**
  * @author andremello
@@ -29,8 +31,15 @@ public abstract class FileSystemFaceDatabaseService {
 	public final static String LOG_INFO_RELATIVE_CREATION_PROBLEM = "O arquivo {1} não pode ser criado no diretório relativo. Esse será criado no diretório padrão para imagens.";
 	public final static String LOG_ERROR_DEFAULT_CREATION_PROBLEM = "O arquivo não pode ser criado nem mesmo no diretório padrão para imagens. Operação abortada.";
 	public final static String LOG_ERROR_FILE_NOT_FOUND = "Arquivo sem permissão de escrita ou provável problema de concorrência.";
+	public final static String ABSOLUT_PATH;
+	public final static String PHOTO_FILE_EXTENSION = ".jpg";
 	
-	public final static String photoFileExtension = ".jpg";
+	static {
+		
+		 ABSOLUT_PATH = Environment.getExternalStoragePublicDirectory( Environment.DIRECTORY_PICTURES )
+					.getAbsolutePath();
+		
+	}
 	
 	private FileSystemFaceDatabaseService() {}
 	
@@ -43,7 +52,7 @@ public abstract class FileSystemFaceDatabaseService {
 			
 			return FileSystemService.getFilePathOrCreateItURI( new File( absoluteDirectory.concat( File.separator ).concat( sampleName ) ), 
 					photoName, 
-					photoFileExtension );
+					PHOTO_FILE_EXTENSION );
 			
 		} catch (FileNotCreatedException e) {
 			
@@ -58,7 +67,7 @@ public abstract class FileSystemFaceDatabaseService {
 
 				final File mediaDir = new File( absoluteDirectory, sampleName );
 				
-				return FileSystemService.getFilePathOrCreateItURI( mediaDir, photoName, photoFileExtension ); 
+				return FileSystemService.getFilePathOrCreateItURI( mediaDir, photoName, PHOTO_FILE_EXTENSION ); 
 				
 			} catch (FileNotCreatedException e2) {
 				
@@ -88,7 +97,7 @@ public abstract class FileSystemFaceDatabaseService {
 		
 	}
 	
-	public static Uri getCSVMapFileOrCreateItUri() {
+	public static Uri getCSVMapFileOrCreateItUri() throws FileWriteProblemException {
 		
 		final String csvFileExtension = ".txt";
 		String absoluteDirectory = SAMPLES_DIRECTORY;
@@ -105,14 +114,18 @@ public abstract class FileSystemFaceDatabaseService {
 			
 			try {
 				
-				absoluteDirectory = Environment.getExternalStoragePublicDirectory( Environment.DIRECTORY_PICTURES )
-						.getAbsolutePath()
-						.concat( File.separator )
-						.concat( SAMPLES_DIRECTORY );
+				absoluteDirectory = ABSOLUT_PATH.concat( File.separator ).concat( SAMPLES_DIRECTORY ).toString();
 
 				final File mediaDir = new File( absoluteDirectory );
+				final Uri csvUri = FileSystemService.getFilePathOrCreateItURI( mediaDir, FACES_MAP_FILE_NAME, csvFileExtension );
 				
-				return FileSystemService.getFilePathOrCreateItURI( mediaDir, FACES_MAP_FILE_NAME, csvFileExtension ); 
+				if ( !new File( csvUri.getPath() ).exists() ) {
+
+					FileSystemFaceDatabaseService.createCSVMapFile( csvUri );
+					
+				}
+				
+				return csvUri;
 				
 			} catch (FileNotCreatedException e2) {
 				
@@ -126,60 +139,101 @@ public abstract class FileSystemFaceDatabaseService {
 		
 	}
 	
-	public static Boolean writeNewSampleLine( final Uri csvFileUri, final Sample sample ) {
-		
-		final File csvFile = new File( csvFileUri.getPath() );
-		final Photo lastSavedPhoto = sample.retrieveLastPhoto();
-		final String photoPath = FileSystemService.mountFilePath( csvFile.getParentFile().getAbsolutePath(), sample.getSampleName(), lastSavedPhoto.getPhotoName().concat( photoFileExtension ) );
-		final String photoLable = sample.getSampleName();
-	
-		StringBuilder content = null;
+	private static void createCSVMapFile( Uri csvFileUri ) throws FileWriteProblemException {
 		
 		try {
 			
-			content = FileSystemService.readTextFile( csvFileUri );
+			FileSystemService.writeToTextFile( csvFileUri, new StringBuilder() );
+			
+		} catch (UnsupportedEncodingException e) {
+			
+			Log.e( TAG, "O encoding não é suportado pelo sistema.", e );
+			
+			throw new FileWriteProblemException( csvFileUri.getPath(), e );
 			
 		} catch (FileNotFoundException e) {
 			
 			Log.e( TAG, LOG_ERROR_FILE_NOT_FOUND, e );
 			
-			return false;
+			throw new FileWriteProblemException( csvFileUri.getPath(), e );
 			
 		}
 		
-		if ( content != null ) {
-			
-			content.append( photoPath );
-			content.append( ";" );
-			content.append( photoLable ).append( FileSystemService.newLine );
+	}
+	
+	public static void writeNewSampleContent( final Uri csvFileUri, final StringBuilder newContent ) throws FileWriteProblemException, InvalidCSVSampleContentException {
+		
+		final StringBuilder csvFileContent;
+	
+		if ( newContent != null && newContent.toString().trim().length() > 0 ) {
 			
 			try {
 				
-				FileSystemService.writeToTextFile( csvFileUri, content );
+				csvFileContent = FileSystemService.readTextFile( csvFileUri );
+				
+			} catch (FileNotFoundException e) {
+				
+				Log.e( TAG, LOG_ERROR_FILE_NOT_FOUND, e );
+				
+				throw new FileWriteProblemException( csvFileUri.getPath(), e );
+				
+			}
+			
+			csvFileContent.append( newContent );
+			
+			try {
+				
+				FileSystemService.writeToTextFile( csvFileUri, csvFileContent );
 				
 			} catch (UnsupportedEncodingException e) {
 				
 				Log.e( TAG, "O encoding não é suportado pelo sistema.", e );
 				
-				return false;
+				throw new FileWriteProblemException( csvFileUri.getPath(), e );
 				
 			} catch (FileNotFoundException e) {
 				
 				Log.e( TAG, "Arquivo de mapeamento foi deletado provavelmente ou o método de criação não foi bem sucedido.", e );
 				
-				return false;
+				throw new FileWriteProblemException( csvFileUri.getPath(), e );
 				
 			} catch (FileWriteProblemException e) {
 				
 				Log.e( TAG, LOG_ERROR_FILE_NOT_FOUND, e );
 				
-				return false;
+				throw new FileWriteProblemException( csvFileUri.getPath(), e );
 				
 			}
 			
-			return true;
+		} else throw new InvalidCSVSampleContentException(); 
+		
+	}
+
+	public static void addNewSampleContent( Sample sample ) throws FileWriteProblemException, InvalidSampleException {
+		
+		final StringBuilder newContent = new StringBuilder();
+		
+		for ( Photo addedPhoto : sample.getSamplesPhotos() ) {
 			
-		} else return false;
+			newContent.append( FileSystemService.mountFilePath( ABSOLUT_PATH.toString(), sample.getSampleName(), addedPhoto.getPhotoName() ) )
+			.append( PHOTO_FILE_EXTENSION )
+			.append( ";" )
+			.append( sample.getSampleName() )
+			.append( FileSystemService.NEW_LINE );
+			
+		}
+		
+		final Uri csvFileUri = FileSystemFaceDatabaseService.getCSVMapFileOrCreateItUri();
+		
+		try {
+			
+			FileSystemFaceDatabaseService.writeNewSampleContent( csvFileUri, newContent );
+			
+		} catch (InvalidCSVSampleContentException e) {
+			
+			throw new InvalidSampleException( sample.getSampleName(), e );
+			
+		}
 		
 	}
 	
