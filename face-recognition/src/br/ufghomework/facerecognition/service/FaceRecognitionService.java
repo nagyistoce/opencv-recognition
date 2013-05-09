@@ -4,12 +4,12 @@ import org.opencv.core.Mat;
 
 public class FaceRecognitionService {
 
-	public static String recognize( Mat faceToRecognize ) {
+	public static String recognize( Mat faceToRecognize, String csvFilePath ) {
 		
-		return nativeRecognize( faceToRecognize );
+		return nativeRecognize( faceToRecognize.nativeObj, csvFilePath );
 		
 	}
 	
-	private static native String nativeRecognize( Mat faceToRecog );
+	private static native String nativeRecognize( long faceToRecog, String csvFilePath );
 	
 }

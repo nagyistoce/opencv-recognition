@@ -8,7 +8,6 @@
 
 #ifndef _Included_br_ufghomework_facerecognition_service_FaceRecognitionService
 #define _Included_br_ufghomework_facerecognition_service_FaceRecognitionService
-#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -16,11 +15,11 @@ extern "C" {
 /*
  * Class:     br_ufghomework_facerecognition_service_FaceRecognitionService
  * Method:    nativeRecognize
- * Signature: (Ljava/lang/String;F)J
  */
 JNIEXPORT jstring JNICALL Java_br_ufghomework_facerecognition_service_FaceRecognitionService_nativeRecognize
-  (JNIEnv *, jclass, jstring);
+  (JNIEnv *, jclass, jlong, jstring);
 
 #ifdef __cplusplus
 }
+#endif
 #endif

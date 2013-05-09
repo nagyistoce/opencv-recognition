@@ -1,5 +1,6 @@
-obj/local/armeabi/objs/detection_based_tracker/DetectionBasedTracker_jni.o: \
- jni/DetectionBasedTracker_jni.cpp jni/DetectionBasedTracker_jni.h \
+/Users/almde89/gitproject/opencv-recognition/face-recognition/obj/local/armeabi/objs/detection_based_tracker/DetectionBasedTracker_jni.o: \
+ /Users/almde89/gitproject/opencv-recognition/face-recognition/jni/DetectionBasedTracker_jni.cpp \
+ /Users/almde89/gitproject/opencv-recognition/face-recognition/jni/DetectionBasedTracker_jni.h \
  /Users/almde89/Downloads/android-ndk-r8e/platforms/android-8/arch-arm/usr/include/jni.h \
  /Users/almde89/Downloads/OpenCV-2.4.5-android-sdk/sdk/native/jni/include/opencv2/core/core.hpp \
  /Users/almde89/Downloads/OpenCV-2.4.5-android-sdk/sdk/native/jni/include/opencv2/core/types_c.h \
@@ -48,7 +49,7 @@ obj/local/armeabi/objs/detection_based_tracker/DetectionBasedTracker_jni.o: \
  /Users/almde89/Downloads/android-ndk-r8e/sources/cxx-stl/gnu-libstdc++/4.6/include/deque \
  /Users/almde89/Downloads/android-ndk-r8e/platforms/android-8/arch-arm/usr/include/android/log.h
 
-jni/DetectionBasedTracker_jni.h:
+/Users/almde89/gitproject/opencv-recognition/face-recognition/jni/DetectionBasedTracker_jni.h:
 
 /Users/almde89/Downloads/android-ndk-r8e/platforms/android-8/arch-arm/usr/include/jni.h:
 

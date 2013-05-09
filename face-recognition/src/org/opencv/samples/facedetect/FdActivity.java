@@ -197,9 +197,8 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
         
         if( facesArray.length > 0 && !isFaceRecogServiceActive ) {
 
+        	isFaceRecogServiceActive = true;
         	new FaceRecognitionTask().execute( mGray );
-        	
-        	isFaceRecogServiceActive = false;
         	
         }
 
@@ -264,7 +263,7 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
 
 				for ( Mat face : params ) {
 
-					final String sampleName = FaceRecognitionService.recognize( face );
+					final String sampleName = FaceRecognitionService.recognize( face, "/storage/sdcard0/Pictures/faceSamples/facesMap.txt" );
 					
 					if ( sampleName != null ) {
 						
@@ -286,6 +285,8 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
 				
 				Toast.makeText( FdActivity.this, result, Toast.LENGTH_LONG ).show();
 				Log.i( TAG, "O sample {1} foi identificado.".replace( "{1}", result ) );
+				
+				isFaceRecogServiceActive = false;
 				
 				super.onPostExecute(result);
 				
