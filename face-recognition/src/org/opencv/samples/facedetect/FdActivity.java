@@ -21,12 +21,15 @@ import org.opencv.objdetect.CascadeClassifier;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.Toast;
 import br.ufghomework.R;
+import br.ufghomework.facerecognition.service.FaceRecognitionService;
 
 public class FdActivity extends Activity implements CvCameraViewListener2 {
 
@@ -52,6 +55,8 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
 
     private float                  mRelativeFaceSize   = 0.2f;
     private int                    mAbsoluteFaceSize   = 0;
+    
+    private Boolean isFaceRecogServiceActive 		   = false;
 
     private CameraBridgeViewBase   mOpenCvCameraView;
 
@@ -189,6 +194,14 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
         Rect[] facesArray = faces.toArray();
         for (int i = 0; i < facesArray.length; i++)
             Core.rectangle(mRgba, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
+        
+        if( facesArray.length > 0 && !isFaceRecogServiceActive ) {
+
+        	new FaceRecognitionTask().execute( mGray );
+        	
+        	isFaceRecogServiceActive = false;
+        	
+        }
 
         return mRgba;
     }
@@ -241,4 +254,45 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
             }
         }
     }
+    
+    private class FaceRecognitionTask extends AsyncTask<Mat, Void, String> {
+
+		@Override
+		protected String doInBackground(Mat... params) {
+
+			if ( params != null ) {
+
+				for ( Mat face : params ) {
+
+					final String sampleName = FaceRecognitionService.recognize( face );
+					
+					if ( sampleName != null ) {
+						
+						return sampleName;
+						
+					}
+					
+				}
+				
+			}
+			
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(String result) {
+
+			if ( result != null ) {
+				
+				Toast.makeText( FdActivity.this, result, Toast.LENGTH_LONG ).show();
+				Log.i( TAG, "O sample {1} foi identificado.".replace( "{1}", result ) );
+				
+				super.onPostExecute(result);
+				
+			}
+			
+		}
+    	
+    }
+    
 }

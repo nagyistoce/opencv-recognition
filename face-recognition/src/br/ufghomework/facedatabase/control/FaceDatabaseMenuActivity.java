@@ -204,47 +204,49 @@ public class FaceDatabaseMenuActivity extends Activity {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			
-			if ( event.getAction() == MotionEvent.ACTION_DOWN ) {
-				
-				final String sampleName = samplesNameView.getText().toString();
-				
-				if ( sample == null ) {
-						
-					try {
-						
+			final String sampleName = samplesNameView.getText().toString();
+			
+			try {
+			
+				if ( event.getAction() == MotionEvent.ACTION_DOWN ) {
+					
+					
+					if ( sample == null ) {
+							
 						sample = new Sample( sampleName );
-						
-					} catch (InvalidSampleNameException e) {
-						
-						Toast.makeText( FaceDatabaseMenuActivity.this, e.getMessage(), Toast.LENGTH_LONG ).show();
-						Log.w( TAG, LOG_ERROR_INVALID_SAMPLE.replace( "{1}", sampleName ), e );
 						
 					}
 					
-				}
-				
-				try {
-					
+					sample.setSampleName( sampleName );
+						
 					final Photo newPhoto = new Photo();
 					
 					newPhoto.setPhotoName( sample.getSampleName().concat( photoQuantity.toString() ) );
 					
 					sample.add( newPhoto );
+						
+					startPhotoActivity();
 					
-				} catch (InvalidPhotoException e) {
-					
-					Toast.makeText( FaceDatabaseMenuActivity.this, e.getMessage(), Toast.LENGTH_LONG ).show();
-					Log.w( TAG, LOG_ERROR_INVALID_PHOTO, e );
-					
-					return false;
-					
-				}
+					return true;
+						
+				} else return false;
+			
+			} catch (InvalidPhotoException e) {
 				
-				startPhotoActivity();
+				Toast.makeText( FaceDatabaseMenuActivity.this, e.getMessage(), Toast.LENGTH_LONG ).show();
+				Log.w( TAG, LOG_ERROR_INVALID_PHOTO, e );
 				
-				return true;
-					
-			} else return false;
+				return false;
+				
+			} catch (InvalidSampleNameException e) {
+				
+				Toast.makeText( FaceDatabaseMenuActivity.this, e.getMessage(), Toast.LENGTH_LONG ).show();
+				Log.w( TAG, LOG_ERROR_INVALID_SAMPLE.replace( "{1}", sampleName ), e );
+				
+				return false;
+				
+			}
+			
 		}
 		
 	}
