@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
+import br.ufghomework.facedatabase.exceptions.CannotConvertImageFile;
 import br.ufghomework.facedatabase.exceptions.InvalidCSVSampleContentException;
 import br.ufghomework.facedatabase.exceptions.SampleFileNotCreatedException;
 import br.ufghomework.filesystem.exceptions.FileNotCreatedException;
@@ -31,7 +32,7 @@ public abstract class FileSystemFaceDatabaseService {
 	public final static String LOG_ERROR_DEFAULT_CREATION_PROBLEM = "O arquivo não pode ser criado nem mesmo no diretório padrão para imagens. Operação abortada.";
 	public final static String LOG_ERROR_FILE_NOT_FOUND = "Arquivo sem permissão de escrita ou provável problema de concorrência.";
 	public final static String ABSOLUT_PATH;
-	public final static String PHOTO_FILE_EXTENSION = ".jpg";
+	public final static String PHOTO_FILE_EXTENSION = ".png";
 	
 	static {
 		
@@ -208,11 +209,15 @@ public abstract class FileSystemFaceDatabaseService {
 		
 	}
 
-	public static void addNewSampleContent( Sample sample ) throws FileWriteProblemException, InvalidCSVSampleContentException {
+	public static void addNewSampleContent( Sample sample, File cascadeFile ) throws FileWriteProblemException, InvalidCSVSampleContentException, CannotConvertImageFile {
 		
 		final StringBuilder newContent = new StringBuilder();
 		
 		for ( Photo addedPhoto : sample.getSamplesPhotos() ) {
+			
+			PhotoConverterService.convertToCroppedPhotoFromFilePath( 
+					new File( FileSystemService.mountFilePath( ABSOLUT_PATH, SAMPLES_DIRECTORY ).concat( addedPhoto.getPhotoName() ).concat( PHOTO_FILE_EXTENSION ) ), 
+					cascadeFile );
 			
 			newContent.append( FileSystemService.mountFilePath( ABSOLUT_PATH.toString(), sample.getSampleName(), addedPhoto.getPhotoName() ) )
 			.append( PHOTO_FILE_EXTENSION )

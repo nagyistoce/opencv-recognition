@@ -1,6 +1,9 @@
 package br.ufghomework.facedatabase.control;
 
+import java.io.File;
+
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -12,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import br.ufghomework.R;
+import br.ufghomework.facedatabase.exceptions.CannotConvertImageFile;
 import br.ufghomework.facedatabase.exceptions.InvalidCSVSampleContentException;
 import br.ufghomework.facedatabase.service.FileSystemFaceDatabaseService;
 import br.ufghomework.filesystem.exceptions.FileWriteProblemException;
@@ -22,7 +26,7 @@ import br.ufghomework.model.exceptions.InvalidSampleNameException;
 
 public class FaceDatabaseMenuActivity extends Activity {
 
-	public static final String TAG = "FaceDatabaseMenuActivity";
+	public static final String TAG = "br.u.f.c.FaceDatabaseMenuActivity";
 	public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
 	public static final String START_SAMPLE_DESC = "Restam {1} fotos para o sample.";
 	public static final String STATE_FIELD_IS_SAMPLE_NAME_ENABLED = "isSampleNameEnabled";
@@ -108,45 +112,59 @@ public class FaceDatabaseMenuActivity extends Activity {
 		
 		if ( resultCode == Activity.RESULT_OK && requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE ) {
 
-			isSampleNameEnabled = false;
-			
-			if ( photoQuantity >= 10 ) {
-
-				Toast.makeText( this, LOG_INFO_SAMPLE_COMPLETE.replace( "{1}", sample.getSampleName() ), Toast.LENGTH_LONG ).show();
+			try {
 				
-				try {
+				isSampleNameEnabled = false;
+				
+				if ( photoQuantity >= 10 ) {
+	
+					Toast.makeText( this, LOG_INFO_SAMPLE_COMPLETE.replace( "{1}", sample.getSampleName() ), Toast.LENGTH_LONG ).show();
+						
+					File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
+                    File mCascadeFile = new File(cascadeDir, "lbpcascade_frontalface.xml");
 					
-					FileSystemFaceDatabaseService.addNewSampleContent( sample );
-					
-				} catch (FileWriteProblemException e) {
-
-					FileSystemFaceDatabaseService.deleteSample( sample );
-					
-					Toast.makeText( this, LOG_ERROR_UNAVAILABLE_MAP_FILE, Toast.LENGTH_LONG );
-					Log.e( TAG, LOG_ERROR_UNAVAILABLE_MAP_FILE, e );
-					
-				} catch (InvalidCSVSampleContentException e) {
-
-					FileSystemFaceDatabaseService.deleteSample( sample );
-					
-					Toast.makeText( this, LOG_ERROR_INVALID_SAMPLE.replace( "{1}", sample.getSampleName() ), Toast.LENGTH_LONG );
-					Log.e( TAG, LOG_ERROR_INVALID_SAMPLE.replace( "{1}", sample.getSampleName() ), e );
+                    //FIXME esse código é um código de teste. Removê-lo.
+                    
+					FileSystemFaceDatabaseService.addNewSampleContent( sample, mCascadeFile );
+						
+					finish();
 					
 				}
 				
-				finish();
+				photoQuantity++;
+			
+			} catch (FileWriteProblemException e) {
+
+				FileSystemFaceDatabaseService.deleteSample( sample );
+				
+				Toast.makeText( this, LOG_ERROR_UNAVAILABLE_MAP_FILE, Toast.LENGTH_LONG ).show();
+				Log.e( TAG, LOG_ERROR_UNAVAILABLE_MAP_FILE, e );
+				
+			} catch (InvalidCSVSampleContentException e) {
+
+				FileSystemFaceDatabaseService.deleteSample( sample );
+				
+				Toast.makeText( this, LOG_ERROR_INVALID_SAMPLE.replace( "{1}", sample.getSampleName() ), Toast.LENGTH_LONG ).show();
+				Log.e( TAG, LOG_ERROR_INVALID_SAMPLE.replace( "{1}", sample.getSampleName() ), e );
+				
+			} catch (CannotConvertImageFile e) {
+				
+				//FIXME colocar a mensagem de erro correta.
+				Toast.makeText( this, "Deu merda!", Toast.LENGTH_SHORT ).show();
 				
 			}
 			
-			photoQuantity++;
-			
 		} else if ( resultCode == Activity.RESULT_CANCELED ) {
+			
+			sample.removeLastPhoto();
 			
 			Toast.makeText( this, LOG_INFO_PHOTO_CAPTURE_CANCEL, Toast.LENGTH_LONG ).show();
 			
 			Log.i( TAG, LOG_INFO_PHOTO_CAPTURE_CANCEL );
 			
 		} else {
+			
+			sample.removeLastPhoto();
 			
 			Toast.makeText( this, LOG_INFO_PHOTO_CAPTURE_PROBLEM, Toast.LENGTH_LONG ).show();
 			

@@ -38,7 +38,7 @@
 using namespace cv;
 using namespace std;
 
-static void read_csv(JNIEnv * jenv, const jstring& filename, vector<Mat>& images, vector<jstring>& labels, char separator = ';') {
+static void read_csv(JNIEnv * jenv, const jstring& filename, vector<Mat>& images, vector<jstring>& labels, vector<int>& apiLabels, char separator = ';') {
 
 	const string filneNameString = jenv->GetStringUTFChars( filename, NULL );
 
@@ -62,14 +62,44 @@ static void read_csv(JNIEnv * jenv, const jstring& filename, vector<Mat>& images
     }
 
     string line, path, classlabel;
+    int labelCount = 0;
 
     while (getline(file, line)) {
         stringstream liness(line);
         getline(liness, path, separator);
         getline(liness, classlabel);
+
         if(!path.empty() && !classlabel.empty()) {
-            images.push_back(imread(path, 0));
-            labels.push_back( jenv->NewStringUTF( classlabel.c_str() ) );
+
+        	Mat faceToPush = imread( path, IMREAD_GRAYSCALE );
+
+			LOGD( format( "-------------------------- channels %d", faceToPush.channels() ).c_str() );
+
+        	if ( faceToPush.clone().isContinuous() ) {
+
+        		LOGD( format( "Leu uma linha. %s", classlabel.c_str() ).c_str() );
+				images.push_back( faceToPush );
+				labels.push_back( jenv->NewStringUTF( classlabel.c_str() ) );
+				apiLabels.push_back( labelCount++ );
+
+        	} else {
+
+        		LOGD( "A matriz de entrada não é contínua." );
+
+				//FIXME colocar depois a classe de excecao
+
+				jclass je = jenv->FindClass("java/lang/Exception");
+
+				if(!je) {
+
+					je = jenv->FindClass("java/lang/Exception");
+
+				}
+
+				jenv->ThrowNew( je, "A matriz de entrada não é contínua." );
+
+        	}
+
         }
     }
 }
@@ -78,14 +108,35 @@ JNIEXPORT jstring JNICALL Java_br_ufghomework_facerecognition_service_FaceRecogn
 (JNIEnv * jenv, jclass, jlong faceToRecog, jstring csvFilePathDsc)
 {
 
-	jstring sample = jenv->NewStringUTF( "andre" );
+	jstring sample = NULL;
+
+	Mat faceToRecognize = *((Mat*)faceToRecog);
+
+	if ( !faceToRecognize.isContinuous() ) {
+
+		LOGD( "A matriz de entrada não é contínua." );
+
+		//FIXME colocar depois a classe de excecao
+
+		jclass je = jenv->FindClass("java/lang/Exception");
+
+		if(!je) {
+
+			je = jenv->FindClass("java/lang/Exception");
+
+		}
+
+		jenv->ThrowNew( je, NULL );
+
+	}
 
 	vector<Mat> images;
 	vector<jstring> labels;
+	vector<int> apiLabels;
 
 	try {
 
-		read_csv( jenv, csvFilePathDsc, images, labels );
+		read_csv( jenv, csvFilePathDsc, images, labels, apiLabels );
 
 	} catch (cv::Exception& e) {
 
@@ -104,7 +155,7 @@ JNIEXPORT jstring JNICALL Java_br_ufghomework_facerecognition_service_FaceRecogn
 		jenv->ThrowNew(je, e.what());
 
 	}
-/*
+
 	//Avalia se ha um numero suficiente de imagens.
 	if(images.size() <= 1) {
 
@@ -144,20 +195,19 @@ JNIEXPORT jstring JNICALL Java_br_ufghomework_facerecognition_service_FaceRecogn
 	//      cv::createEigenFaceRecognizer(0, 123.0);
 	//
 	Ptr<FaceRecognizer> model = createEigenFaceRecognizer();
-	model->train(images, labels);
+	model->train(images, apiLabels);
 	// The following line predicts the label of a given
 	// test image:
-	//FIXME passar a matriz capturada para avaliacao
-	int predictedLabel = model->predict(NULL);
+	int predictedLabel = model->predict( faceToRecognize );
 
-	// Here is how to get the eigenvalues of this Eigenfaces model:
-	Mat eigenvalues = model->getMat("eigenvalues");
-	// And we can do the same to display the Eigenvectors (read Eigenfaces):
-	Mat W = model->getMat("eigenvectors");
-	// Get the sample mean from the training data
-	Mat mean = model->getMat("mean");
+	if ( predictedLabel > -1 ) {
 
-*/
+		LOGD( format( "Índice do label identificado é %d.", predictedLabel ).c_str() );
+
+		sample = labels[predictedLabel];
+
+	}
+
 	return sample;
 
 }

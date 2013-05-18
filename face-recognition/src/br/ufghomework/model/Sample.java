@@ -89,4 +89,10 @@ public class Sample implements Serializable {
 		
 	}
 	
+	public Photo removeLastPhoto() {
+		
+		return this.samplesPhotos.remove( this.samplesPhotos.size() - 1 );
+		
+	}
+	
 }

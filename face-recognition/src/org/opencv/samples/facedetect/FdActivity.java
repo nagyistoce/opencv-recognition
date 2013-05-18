@@ -49,6 +49,7 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
     private File                   mCascadeFile;
     private CascadeClassifier      mJavaDetector;
     private DetectionBasedTracker  mNativeDetector;
+    private Toast				   sampleName;
 
     private int                    mDetectorType       = JAVA_DETECTOR;
     private String[]               mDetectorName;
@@ -234,6 +235,15 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
         }
         return true;
     }
+    
+   @Override
+   protected void onStop() {
+	   
+	   sampleName.cancel();
+	   
+	   super.onStop();
+	   
+   }
 
     private void setMinFaceSize(float faceSize) {
         mRelativeFaceSize = faceSize;
@@ -283,7 +293,10 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
 
 			if ( result != null ) {
 				
-				Toast.makeText( FdActivity.this, result, Toast.LENGTH_LONG ).show();
+				sampleName = Toast.makeText( FdActivity.this, result, Toast.LENGTH_SHORT );
+				
+				sampleName.show();
+				
 				Log.i( TAG, "O sample {1} foi identificado.".replace( "{1}", result ) );
 				
 				isFaceRecogServiceActive = false;
