@@ -140,6 +140,8 @@ public class FaceDatabaseMenuActivity extends Activity {
 				Toast.makeText( this, LOG_ERROR_UNAVAILABLE_MAP_FILE, Toast.LENGTH_LONG ).show();
 				Log.e( TAG, LOG_ERROR_UNAVAILABLE_MAP_FILE, e );
 				
+				finish();
+				
 			} catch (InvalidCSVSampleContentException e) {
 
 				FileSystemFaceDatabaseService.deleteSample( sample );
@@ -147,10 +149,14 @@ public class FaceDatabaseMenuActivity extends Activity {
 				Toast.makeText( this, LOG_ERROR_INVALID_SAMPLE.replace( "{1}", sample.getSampleName() ), Toast.LENGTH_LONG ).show();
 				Log.e( TAG, LOG_ERROR_INVALID_SAMPLE.replace( "{1}", sample.getSampleName() ), e );
 				
+				finish();
+				
 			} catch (CannotConvertImageFile e) {
 				
 				//FIXME colocar a mensagem de erro correta.
 				Toast.makeText( this, "Deu merda!", Toast.LENGTH_SHORT ).show();
+				
+				finish();
 				
 			}
 			

@@ -215,15 +215,11 @@ public abstract class FileSystemFaceDatabaseService {
 		
 		for ( Photo addedPhoto : sample.getSamplesPhotos() ) {
 			
-			PhotoConverterService.convertToCroppedPhotoFromFilePath( 
-					new File( FileSystemService.mountFilePath( ABSOLUT_PATH, SAMPLES_DIRECTORY ).concat( addedPhoto.getPhotoName() ).concat( PHOTO_FILE_EXTENSION ) ), 
-					cascadeFile );
-			
 			newContent.append( FileSystemService.mountFilePath( ABSOLUT_PATH.toString(), sample.getSampleName(), addedPhoto.getPhotoName() ) )
-			.append( PHOTO_FILE_EXTENSION )
-			.append( ";" )
-			.append( sample.getSampleName() )
-			.append( FileSystemService.NEW_LINE );
+				.append( PHOTO_FILE_EXTENSION )
+				.append( ";" )
+				.append( sample.getSampleName() )
+				.append( FileSystemService.NEW_LINE );
 			
 		}
 		

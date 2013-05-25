@@ -75,7 +75,13 @@ static void read_csv(JNIEnv * jenv, const jstring& filename, vector<Mat>& images
 
 			LOGD( format( "-------------------------- channels %d", faceToPush.channels() ).c_str() );
 
-        	if ( faceToPush.clone().isContinuous() ) {
+			LOGD( format( "---------------> %d step", faceToPush.step ).c_str() );
+			LOGD( format( "---------------> %d cols", faceToPush.cols ).c_str() );
+			LOGD( format( "---------------> %d elemSize", faceToPush.elemSize() ).c_str() );
+
+			faceToPush.reshape( 0, 1 );
+
+        	if ( faceToPush.isContinuous() ) {
 
         		LOGD( format( "Leu uma linha. %s", classlabel.c_str() ).c_str() );
 				images.push_back( faceToPush );
