@@ -172,7 +172,16 @@ JNIEXPORT void JNICALL Java_org_opencv_samples_facedetect_DetectionBasedTracker_
     try
     {
         vector<Rect> RectFaces;
-        ((DetectionBasedTracker*)thiz)->process(*((Mat*)imageGray));
+        Mat image = *((Mat*)imageGray);
+
+		LOGD( format( "-------------------------- channels %d", image.channels() ).c_str() );
+
+		LOGD( format( "---------------> %d step", image.step ).c_str() );
+		LOGD( format( "---------------> %d cols", image.cols ).c_str() );
+		LOGD( format( "---------------> %d rows", image.rows ).c_str() );
+		LOGD( format( "---------------> %d elemSize", image.elemSize() ).c_str() );
+
+        ((DetectionBasedTracker*)thiz)->process(image);
         ((DetectionBasedTracker*)thiz)->getObjects(RectFaces);
         vector_Rect_to_Mat(RectFaces, *((Mat*)faces));
     }

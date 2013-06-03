@@ -1,9 +1,6 @@
 package br.ufghomework.facedatabase.control;
 
-import java.io.File;
-
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -15,7 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import br.ufghomework.R;
-import br.ufghomework.facedatabase.exceptions.CannotConvertImageFile;
 import br.ufghomework.facedatabase.exceptions.InvalidCSVSampleContentException;
 import br.ufghomework.facedatabase.service.FileSystemFaceDatabaseService;
 import br.ufghomework.filesystem.exceptions.FileWriteProblemException;
@@ -120,12 +116,7 @@ public class FaceDatabaseMenuActivity extends Activity {
 	
 					Toast.makeText( this, LOG_INFO_SAMPLE_COMPLETE.replace( "{1}", sample.getSampleName() ), Toast.LENGTH_LONG ).show();
 						
-					File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
-                    File mCascadeFile = new File(cascadeDir, "lbpcascade_frontalface.xml");
-					
-                    //FIXME esse código é um código de teste. Removê-lo.
-                    
-					FileSystemFaceDatabaseService.addNewSampleContent( sample, mCascadeFile );
+					FileSystemFaceDatabaseService.addNewSampleContent( sample );
 						
 					finish();
 					
@@ -151,14 +142,7 @@ public class FaceDatabaseMenuActivity extends Activity {
 				
 				finish();
 				
-			} catch (CannotConvertImageFile e) {
-				
-				//FIXME colocar a mensagem de erro correta.
-				Toast.makeText( this, "Deu merda!", Toast.LENGTH_SHORT ).show();
-				
-				finish();
-				
-			}
+			} 
 			
 		} else if ( resultCode == Activity.RESULT_CANCELED ) {
 			

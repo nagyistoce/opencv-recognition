@@ -10,7 +10,6 @@ import java.io.UnsupportedEncodingException;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
-import br.ufghomework.facedatabase.exceptions.CannotConvertImageFile;
 import br.ufghomework.facedatabase.exceptions.InvalidCSVSampleContentException;
 import br.ufghomework.facedatabase.exceptions.SampleFileNotCreatedException;
 import br.ufghomework.filesystem.exceptions.FileNotCreatedException;
@@ -26,7 +25,7 @@ import br.ufghomework.model.Sample;
 public abstract class FileSystemFaceDatabaseService {
 
 	public final static String TAG = "FileSystemFaceDatabaseService";
-	public final static String SAMPLES_DIRECTORY = "faceSamples/";
+	public final static String SAMPLES_DIRECTORY = "faceSamples";
 	public final static String FACES_MAP_FILE_NAME = "facesMap";
 	public final static String LOG_INFO_RELATIVE_CREATION_PROBLEM = "O arquivo {1} não pode ser criado no diretório relativo. Esse será criado no diretório padrão para imagens.";
 	public final static String LOG_ERROR_DEFAULT_CREATION_PROBLEM = "O arquivo não pode ser criado nem mesmo no diretório padrão para imagens. Operação abortada.";
@@ -209,13 +208,13 @@ public abstract class FileSystemFaceDatabaseService {
 		
 	}
 
-	public static void addNewSampleContent( Sample sample, File cascadeFile ) throws FileWriteProblemException, InvalidCSVSampleContentException, CannotConvertImageFile {
+	public static void addNewSampleContent( Sample sample ) throws FileWriteProblemException, InvalidCSVSampleContentException {
 		
 		final StringBuilder newContent = new StringBuilder();
 		
 		for ( Photo addedPhoto : sample.getSamplesPhotos() ) {
 			
-			newContent.append( FileSystemService.mountFilePath( ABSOLUT_PATH.toString(), sample.getSampleName(), addedPhoto.getPhotoName() ) )
+			newContent.append( FileSystemService.mountFilePath( ABSOLUT_PATH.toString(), SAMPLES_DIRECTORY, sample.getSampleName(), addedPhoto.getPhotoName() ) )
 				.append( PHOTO_FILE_EXTENSION )
 				.append( ";" )
 				.append( sample.getSampleName() )

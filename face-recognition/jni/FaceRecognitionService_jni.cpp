@@ -73,13 +73,13 @@ static void read_csv(JNIEnv * jenv, const jstring& filename, vector<Mat>& images
 
         	Mat faceToPush = imread( path, IMREAD_GRAYSCALE );
 
-			LOGD( format( "-------------------------- channels %d", faceToPush.channels() ).c_str() );
+        	LOGD( format( "-------------------------- path %s", path.c_str() ).c_str() );
+        	LOGD( format( "-------------------------- channels %d", faceToPush.channels() ).c_str() );
 
 			LOGD( format( "---------------> %d step", faceToPush.step ).c_str() );
 			LOGD( format( "---------------> %d cols", faceToPush.cols ).c_str() );
+			LOGD( format( "---------------> %d rows", faceToPush.rows ).c_str() );
 			LOGD( format( "---------------> %d elemSize", faceToPush.elemSize() ).c_str() );
-
-			faceToPush.reshape( 0, 1 );
 
         	if ( faceToPush.isContinuous() ) {
 
@@ -113,14 +113,15 @@ static void read_csv(JNIEnv * jenv, const jstring& filename, vector<Mat>& images
 JNIEXPORT jstring JNICALL Java_br_ufghomework_facerecognition_service_FaceRecognitionService_nativeRecognize
 (JNIEnv * jenv, jclass, jlong faceToRecog, jstring csvFilePathDsc)
 {
+	LOGD("Java_br_ufghomework_facerecognition_service_FaceRecognitionService_nativeRecognize enter");
 
 	jstring sample = NULL;
 
 	Mat faceToRecognize = *((Mat*)faceToRecog);
 
-	if ( !faceToRecognize.isContinuous() ) {
+	if ( faceToRecog && !faceToRecognize.isContinuous() ) {
 
-		LOGD( "A matriz de entrada não é contínua." );
+		LOGD( "A matriz de entrada não é contínua ou não existe." );
 
 		//FIXME colocar depois a classe de excecao
 
