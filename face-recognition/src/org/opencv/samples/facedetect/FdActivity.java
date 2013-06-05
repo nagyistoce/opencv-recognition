@@ -16,7 +16,6 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.objdetect.CascadeClassifier;
 
 import android.app.Activity;
@@ -42,7 +41,6 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
     private MenuItem               mItemFace40;
     private MenuItem               mItemFace30;
     private MenuItem               mItemFace20;
-    private MenuItem               mItemType;
 
     private Mat                    mRgba;
     private Mat                    mGray;
@@ -267,7 +265,6 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
 					
 					if ( sampleName != null ) {
 						
-						isFaceRecogServiceActive = false;
 						return sampleName;
 						
 					}
@@ -276,6 +273,8 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
 				
 			}
 			
+			isFaceRecogServiceActive = false;
+			
 			return null;
 		}
 		
@@ -283,14 +282,16 @@ public class FdActivity extends Activity implements CvCameraViewListener2 {
 		protected void onPostExecute(String result) {
 
 			if ( result != null ) {
+
+				if ( sampleName == null )
+					sampleName = Toast.makeText( FdActivity.this, result, Toast.LENGTH_SHORT );
 				
-				sampleName = Toast.makeText( FdActivity.this, result, Toast.LENGTH_SHORT );
+				else
+					sampleName.setText( result );
 				
 				sampleName.show();
 				
 				Log.i( TAG, "O sample {1} foi identificado.".replace( "{1}", result ) );
-				
-				isFaceRecogServiceActive = false;
 				
 				super.onPostExecute(result);
 				

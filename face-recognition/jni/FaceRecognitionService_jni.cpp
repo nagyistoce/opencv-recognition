@@ -119,7 +119,7 @@ JNIEXPORT jstring JNICALL Java_br_ufghomework_facerecognition_service_FaceRecogn
 
 	Mat faceToRecognize = *((Mat*)faceToRecog);
 
-	if ( faceToRecog && !faceToRecognize.isContinuous() ) {
+	if ( !faceToRecognize.isContinuous() ) {
 
 		LOGD( "A matriz de entrada não é contínua ou não existe." );
 
