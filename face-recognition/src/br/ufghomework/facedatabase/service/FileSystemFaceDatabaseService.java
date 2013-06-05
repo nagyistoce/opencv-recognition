@@ -7,11 +7,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 
+import org.opencv.samples.facedetect.DetectionBasedTracker;
+
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
+import br.ufghomework.exception.HomeWorkException;
 import br.ufghomework.facedatabase.exceptions.InvalidCSVSampleContentException;
 import br.ufghomework.facedatabase.exceptions.SampleFileNotCreatedException;
+import br.ufghomework.facerecognition.service.FaceRecognitionService;
+import br.ufghomework.facerecognition.service.exception.ConvertionErrorException;
 import br.ufghomework.filesystem.exceptions.FileNotCreatedException;
 import br.ufghomework.filesystem.exceptions.FileWriteProblemException;
 import br.ufghomework.filesystem.service.FileSystemService;
@@ -208,23 +213,34 @@ public abstract class FileSystemFaceDatabaseService {
 		
 	}
 
-	public static void addNewSampleContent( Sample sample ) throws FileWriteProblemException, InvalidCSVSampleContentException {
+	public static void addNewSampleContent( Sample sample, DetectionBasedTracker detector ) throws FileWriteProblemException, InvalidCSVSampleContentException, HomeWorkException {
 		
-		final StringBuilder newContent = new StringBuilder();
+//		try {
 		
-		for ( Photo addedPhoto : sample.getSamplesPhotos() ) {
+			final StringBuilder newContent = new StringBuilder();
 			
-			newContent.append( FileSystemService.mountFilePath( ABSOLUT_PATH.toString(), SAMPLES_DIRECTORY, sample.getSampleName(), addedPhoto.getPhotoName() ) )
-				.append( PHOTO_FILE_EXTENSION )
-				.append( ";" )
-				.append( sample.getSampleName() )
-				.append( FileSystemService.NEW_LINE );
+			for ( Photo addedPhoto : sample.getSamplesPhotos() ) {
+				
+//				FaceRecognitionService.convertFullPhotoToROI( FileSystemService.mountFilePath( ABSOLUT_PATH.toString(), SAMPLES_DIRECTORY, sample.getSampleName(), addedPhoto.getPhotoName() ).concat( PHOTO_FILE_EXTENSION ),
+//						detector );
+				
+				newContent.append( FileSystemService.mountFilePath( ABSOLUT_PATH.toString(), SAMPLES_DIRECTORY, sample.getSampleName(), addedPhoto.getPhotoName() ) )
+					.append( PHOTO_FILE_EXTENSION )
+					.append( ";" )
+					.append( sample.getSampleName() )
+					.append( FileSystemService.NEW_LINE );
+				
+			}
 			
-		}
-		
-		final Uri csvFileUri = FileSystemFaceDatabaseService.getCSVMapFileOrCreateItUri();
-		
-		FileSystemFaceDatabaseService.writeNewSampleContent( csvFileUri, newContent );
+			final Uri csvFileUri = FileSystemFaceDatabaseService.getCSVMapFileOrCreateItUri();
+			
+			FileSystemFaceDatabaseService.writeNewSampleContent( csvFileUri, newContent );
+			
+//		} catch (ConvertionErrorException e) {
+//			
+//			throw new HomeWorkException( "Problema interno", e );
+//			
+//		}
 			
 	}
 	

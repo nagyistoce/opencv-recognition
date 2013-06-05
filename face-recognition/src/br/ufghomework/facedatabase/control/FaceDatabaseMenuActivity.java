@@ -1,6 +1,16 @@
 package br.ufghomework.facedatabase.control;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.opencv.android.OpenCVLoader;
+import org.opencv.samples.facedetect.DetectionBasedTracker;
+
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -12,6 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import br.ufghomework.R;
+import br.ufghomework.exception.HomeWorkException;
 import br.ufghomework.facedatabase.exceptions.InvalidCSVSampleContentException;
 import br.ufghomework.facedatabase.service.FileSystemFaceDatabaseService;
 import br.ufghomework.filesystem.exceptions.FileWriteProblemException;
@@ -35,6 +46,10 @@ public class FaceDatabaseMenuActivity extends Activity {
 	public static final String LOG_ERROR_INVALID_PHOTO = "A Uri da foto criada é inválido.";
 	public static final String LOG_ERROR_UNAVAILABLE_MAP_FILE = "O arquivo de mapeamento não está disponível.";
 	public static final String LOG_ERROR_INVALID_SAMPLE = "O sample {1} é inválido.";
+	public static final String LOG_ERROR_CALL_FOR_SUPPORT = "Erro interno, alguma correção no programa é necessária.";
+	
+	 private File mCascadeFile;
+	 private DetectionBasedTracker mNativeDetector;
 
 	private Integer photoQuantity;
 	private Sample sample;
@@ -64,6 +79,8 @@ public class FaceDatabaseMenuActivity extends Activity {
 			photoQuantity = 1;
 			
 		}
+		OpenCVLoader.initDebug();
+		System.loadLibrary( "detection_based_tracker" );
 		
 	}
 	
@@ -83,6 +100,8 @@ public class FaceDatabaseMenuActivity extends Activity {
 			finish();
 			
 		}
+		
+		configureCascadeFileForDetection();
 		
 		super.onStart();
 	}
@@ -116,7 +135,7 @@ public class FaceDatabaseMenuActivity extends Activity {
 	
 					Toast.makeText( this, LOG_INFO_SAMPLE_COMPLETE.replace( "{1}", sample.getSampleName() ), Toast.LENGTH_LONG ).show();
 						
-					FileSystemFaceDatabaseService.addNewSampleContent( sample );
+					FileSystemFaceDatabaseService.addNewSampleContent( sample, mNativeDetector );
 						
 					finish();
 					
@@ -139,6 +158,15 @@ public class FaceDatabaseMenuActivity extends Activity {
 				
 				Toast.makeText( this, LOG_ERROR_INVALID_SAMPLE.replace( "{1}", sample.getSampleName() ), Toast.LENGTH_LONG ).show();
 				Log.e( TAG, LOG_ERROR_INVALID_SAMPLE.replace( "{1}", sample.getSampleName() ), e );
+				
+				finish();
+				
+			} catch (HomeWorkException e) {
+
+				FileSystemFaceDatabaseService.deleteSample( sample );
+				
+				Toast.makeText( this, LOG_ERROR_CALL_FOR_SUPPORT, Toast.LENGTH_LONG ).show();
+				Log.e( TAG, LOG_ERROR_CALL_FOR_SUPPORT, e );
 				
 				finish();
 				
@@ -199,6 +227,41 @@ public class FaceDatabaseMenuActivity extends Activity {
 		
 		startActivityForResult( takePhotoSampleIntent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE );
 		
+	}
+
+	/**
+	 * Configura o arquivo xml para fazer a detecção de faces.
+	 */
+	private void configureCascadeFileForDetection() {
+	
+		try {
+			// load cascade file from application resources
+	        InputStream is = getResources().openRawResource(R.raw.lbpcascade_frontalface);
+	        File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
+	        mCascadeFile = new File(cascadeDir, "lbpcascade_frontalface.xml");
+	        FileOutputStream os;
+			os = new FileOutputStream(mCascadeFile);
+	        byte[] buffer = new byte[4096];
+	        int bytesRead;
+	        while ((bytesRead = is.read(buffer)) != -1) {
+	            os.write(buffer, 0, bytesRead);
+	        }
+	        is.close();
+	        os.close();
+	
+	        mNativeDetector = new DetectionBasedTracker(mCascadeFile.getAbsolutePath(), 0);
+	
+	        cascadeDir.delete();
+        
+		} catch (FileNotFoundException e) {
+			Toast.makeText( this, LOG_ERROR_CALL_FOR_SUPPORT, Toast.LENGTH_LONG ).show();
+			Log.e( TAG, LOG_ERROR_CALL_FOR_SUPPORT, e );
+			finish();
+		} catch (IOException e) {
+			Toast.makeText( this, LOG_ERROR_CALL_FOR_SUPPORT, Toast.LENGTH_LONG ).show();
+			Log.e( TAG, LOG_ERROR_CALL_FOR_SUPPORT, e );
+			finish();
+		}
 	}
 	
 	/**
