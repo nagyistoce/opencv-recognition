@@ -1,16 +1,8 @@
 package br.ufghomework.facedatabase.control;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.opencv.android.OpenCVLoader;
-import org.opencv.samples.facedetect.DetectionBasedTracker;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -48,9 +40,6 @@ public class FaceDatabaseMenuActivity extends Activity {
 	public static final String LOG_ERROR_INVALID_SAMPLE = "O sample {1} é inválido.";
 	public static final String LOG_ERROR_CALL_FOR_SUPPORT = "Erro interno, alguma correção no programa é necessária.";
 	
-	 private File mCascadeFile;
-	 private DetectionBasedTracker mNativeDetector;
-
 	private Integer photoQuantity;
 	private Sample sample;
 	private Boolean isSampleNameEnabled;
@@ -101,8 +90,6 @@ public class FaceDatabaseMenuActivity extends Activity {
 			
 		}
 		
-		configureCascadeFileForDetection();
-		
 		super.onStart();
 	}
 	
@@ -135,7 +122,7 @@ public class FaceDatabaseMenuActivity extends Activity {
 	
 					Toast.makeText( this, LOG_INFO_SAMPLE_COMPLETE.replace( "{1}", sample.getSampleName() ), Toast.LENGTH_LONG ).show();
 						
-					FileSystemFaceDatabaseService.addNewSampleContent( sample, mNativeDetector );
+					FileSystemFaceDatabaseService.addNewSampleContent( sample );
 						
 					finish();
 					
@@ -229,41 +216,6 @@ public class FaceDatabaseMenuActivity extends Activity {
 		
 	}
 
-	/**
-	 * Configura o arquivo xml para fazer a detecção de faces.
-	 */
-	private void configureCascadeFileForDetection() {
-	
-		try {
-			// load cascade file from application resources
-	        InputStream is = getResources().openRawResource(R.raw.lbpcascade_frontalface);
-	        File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
-	        mCascadeFile = new File(cascadeDir, "lbpcascade_frontalface.xml");
-	        FileOutputStream os;
-			os = new FileOutputStream(mCascadeFile);
-	        byte[] buffer = new byte[4096];
-	        int bytesRead;
-	        while ((bytesRead = is.read(buffer)) != -1) {
-	            os.write(buffer, 0, bytesRead);
-	        }
-	        is.close();
-	        os.close();
-	
-	        mNativeDetector = new DetectionBasedTracker(mCascadeFile.getAbsolutePath(), 0);
-	
-	        cascadeDir.delete();
-        
-		} catch (FileNotFoundException e) {
-			Toast.makeText( this, LOG_ERROR_CALL_FOR_SUPPORT, Toast.LENGTH_LONG ).show();
-			Log.e( TAG, LOG_ERROR_CALL_FOR_SUPPORT, e );
-			finish();
-		} catch (IOException e) {
-			Toast.makeText( this, LOG_ERROR_CALL_FOR_SUPPORT, Toast.LENGTH_LONG ).show();
-			Log.e( TAG, LOG_ERROR_CALL_FOR_SUPPORT, e );
-			finish();
-		}
-	}
-	
 	/**
 	 * Padrão observador para comunicação das alterações dos estados da visão. Toda vez que um evento de toque é realizado, o método onTouch dessa classe é invocado.
 	 * 

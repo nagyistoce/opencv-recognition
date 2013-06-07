@@ -119,24 +119,6 @@ JNIEXPORT jstring JNICALL Java_br_ufghomework_facerecognition_service_FaceRecogn
 
 	Mat faceToRecognize = *((Mat*)faceToRecog);
 
-	/*if ( !faceToRecognize.isContinuous() ) {
-
-		LOGD( "A matriz de entrada não é contínua ou não existe." );
-
-		//FIXME colocar depois a classe de excecao
-
-		jclass je = jenv->FindClass("java/lang/Exception");
-
-		if(!je) {
-
-			je = jenv->FindClass("java/lang/Exception");
-
-		}
-
-		jenv->ThrowNew( je, "NÃO ACREDITO QUE ERA ISSO!" );
-
-	}*/
-
 	vector<Mat> images;
 	vector<jstring> labels;
 	vector<int> apiLabels;
@@ -182,10 +164,6 @@ JNIEXPORT jstring JNICALL Java_br_ufghomework_facerecognition_service_FaceRecogn
 
 	}
 
-	Mat matTest = images[images.size() -1 ];
-	apiLabels.pop_back();
-	images.pop_back();
-
 	// The following lines create an Eigenfaces model for
 	// face recognition and train it with the images and
 	// labels read from the given CSV file.
@@ -210,7 +188,7 @@ JNIEXPORT jstring JNICALL Java_br_ufghomework_facerecognition_service_FaceRecogn
 	// The following line predicts the label of a given
 	// test image:
 	//int predictedLabel = model->predict( faceToRecognize );
-	int predictedLabel = model->predict( matTest );
+	int predictedLabel = model->predict( faceToRecognize );
 
 	if ( predictedLabel > -1 ) {
 

@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
-
     <string name="app_name">UFG - Face Recognition</string>
     <string name="title_activity_principal_menu">UFG - Face Recognition</string>
     <string name="action_settings">Settings</string>
@@ -15,6 +14,11 @@
     <string name="bt_start_sample">Comece um Sample</string>
     <string name="edtx_hint_sample_name">Coloque um nome sem espaço e sem caracteres especiais.</string>
     <string name="title_activity_face_database_menu">Face Database Options</string>
-    <string name="hello_world">Hello world!</string>
-
+    <string name="title_activity_face_recog_by_photo">Reconheça um rosto</string>
+    <string name="tv_title_aperte_botao">Aperte o botão para iniciar o reconhecimento por foto
+</string>
+    <string name="bt_start_face_recog">Iniciar Captura para Reconhecimento
+</string>
+    <string name="tv_texto_informativo_recog">Aperte o botão para abrir o aplicativo de foto do dispositivo. Esse aplicativo será utilizado para recolher a foto que desejas reconheçer.
+</string>
 </resources>

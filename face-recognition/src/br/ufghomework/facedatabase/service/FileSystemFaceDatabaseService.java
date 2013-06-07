@@ -7,16 +7,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 
-import org.opencv.samples.facedetect.DetectionBasedTracker;
-
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 import br.ufghomework.exception.HomeWorkException;
 import br.ufghomework.facedatabase.exceptions.InvalidCSVSampleContentException;
 import br.ufghomework.facedatabase.exceptions.SampleFileNotCreatedException;
-import br.ufghomework.facerecognition.service.FaceRecognitionService;
-import br.ufghomework.facerecognition.service.exception.ConvertionErrorException;
 import br.ufghomework.filesystem.exceptions.FileNotCreatedException;
 import br.ufghomework.filesystem.exceptions.FileWriteProblemException;
 import br.ufghomework.filesystem.service.FileSystemService;
@@ -213,7 +209,7 @@ public abstract class FileSystemFaceDatabaseService {
 		
 	}
 
-	public static void addNewSampleContent( Sample sample, DetectionBasedTracker detector ) throws FileWriteProblemException, InvalidCSVSampleContentException, HomeWorkException {
+	public static void addNewSampleContent( Sample sample ) throws FileWriteProblemException, InvalidCSVSampleContentException, HomeWorkException {
 		
 //		try {
 		

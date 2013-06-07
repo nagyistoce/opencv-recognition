@@ -1,7 +1,5 @@
 package br.ufghomework.menu.control;
 
-import org.opencv.samples.facedetect.FdActivity;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +9,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import br.ufghomework.R;
 import br.ufghomework.facedatabase.control.FaceDatabaseMenuActivity;
+import br.ufghomework.facerecognition.controller.FaceRecogByPhotoActivity;
 
 public class PrincipalMenuActivity extends Activity {
 	
@@ -66,7 +65,7 @@ public class PrincipalMenuActivity extends Activity {
 
 			if ( event.getAction() == MotionEvent.ACTION_DOWN ) {
 			
-				Intent faceRecognitionIntent = new Intent( PrincipalMenuActivity.this, FdActivity.class );
+				Intent faceRecognitionIntent = new Intent( PrincipalMenuActivity.this, FaceRecogByPhotoActivity.class );
 				
 				startActivity( faceRecognitionIntent );
 				
